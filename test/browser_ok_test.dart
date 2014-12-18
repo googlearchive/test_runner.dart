@@ -3,7 +3,6 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'package:unittest/unittest.dart';
-import 'package:unittest/html_enhanced_config.dart';
 
 int _partition(List array, int left, int right, int pivotIndex) {
   var pivotValue = array[pivotIndex];

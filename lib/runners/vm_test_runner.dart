@@ -57,8 +57,6 @@ class VmTestRunnerCodeGenerator extends TestRunnerCodeGenerator {
 
   /// Creates the intermediary Dart file that sets the unittest [Configuration].
   Future createTestDartFile(String testFileName) {
-    Completer completer = new Completer();
-
     // Read the content fo the template Dart file.
     String dartFileString = VM_TEST_DART_FILE_TEMPLATE;
 
