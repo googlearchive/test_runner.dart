@@ -1,19 +1,19 @@
-# Test Runner for Dart
+# Dart Test Runner
 
-Test Runner for Dart (TRD) is a command line Test Runner for Dart test files.
-TRD will automatically detect and run all the tests in your Dart project in the
+The Dart Test Runner (DTR) is a command line Test Runner for Dart test files.
+DTR will automatically detect and run all the tests in your Dart project in the
 correct environment (VM or Browser).
 
 ## Installation and usage
 
-TRD is available for download on the
-[Pub Package Manager](https://pub.dartlang.org/packages/test_runner) (NOT YET! for now download locally and run: `dart <path_to_coureur>/bin/coureur.dart`)
+DTR is available for download on the
+[Pub Package Manager](https://pub.dartlang.org/packages/test_runner) (NOT YET! for now download locally and run: `dart <path_to_coureur>/bin/run_tests.dart`)
 
-To install TRD use this command:
+To install DTR use this command:
 
     pub global activate test_runner (NOT YET!)
 
-To run TRD use this command from within the root of your Dart project:
+To run DTR use this command from within the root of your Dart project:
 
     pub global run test_runner (NOT YET!)
 
@@ -125,7 +125,7 @@ executable with `--content-shell-bin`, `--pub-bin` and `--dart2js-bin`.
 
 ### Usage
 
-Generic usage of TRD:
+Generic usage of DTR:
 
     run_tests [options] [<project-or-tests>...]
 
