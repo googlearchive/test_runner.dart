@@ -7,15 +7,15 @@ correct environment (VM or Browser).
 ## Installation and usage
 
 DTR is available for download on the
-[Pub Package Manager](https://pub.dartlang.org/packages/test_runner) (NOT YET! for now download locally and run: `dart <path_to_coureur>/bin/run_tests.dart`)
+[Pub Package Manager](https://pub.dartlang.org/packages/test_runner)
 
 To install DTR use this command:
 
-    pub global activate test_runner (NOT YET!)
+    pub global activate test_runner
 
 To run DTR use this command from within the root of your Dart project:
 
-    pub global run test_runner (NOT YET!)
+    pub global run test_runner:run_tests
 
 Alternatively you can add the pub cache `bin` directory to your PATH:
 `~/.pub-cache/bin`. Then you will be able to simply use:

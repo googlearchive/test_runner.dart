@@ -2,7 +2,23 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-part of test_runner;
+library test_runner.runner;
+
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+import 'package:coverage/src/devtools.dart';
+import 'package:coverage/src/util.dart';
+import 'package:unittest/unittest.dart';
+import 'dart_binaries.dart';
+import 'test_configuration.dart';
+import 'dart_project.dart';
+
+part "runners/vm_test_runner.dart";
+part "runners/browser_test_runner.dart";
+part "runners/browser_templates/browser_test_dart_template.dart";
+part "runners/browser_templates/browser_test_html_template.dart";
+part "runners/vm_templates/vm_test_dart_template.dart";
 
 /// Implementations runs dart tests in a particular environment.
 abstract class TestRunner {

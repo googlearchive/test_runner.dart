@@ -2,7 +2,15 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-part of test_runner;
+library test_runner.dart_project;
+
+import 'dart:async';
+import 'dart:io';
+import 'package:path/path.dart' as path;
+import 'package:yaml/yaml.dart';
+import 'dart_binaries.dart';
+import 'test_configuration.dart';
+import 'test_runner.dart';
 
 /// Represents a Dart project
 class DartProject {

@@ -2,7 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-part of test_runner;
+part of test_runner.runner;
 
 /// Runs Dart tests that can be run in a web browser.
 class BrowserTestRunner extends TestRunner {
@@ -179,15 +179,6 @@ class BrowserTestRunner extends TestRunner {
 /// Generates the files necessary for the Browser Tests tu run.
 class BrowserTestRunnerCodeGenerator extends TestRunnerCodeGenerator {
 
-  /// HTML file used to serve tests by default.
-  static const String DEFAULT_HTML_TEST_FILE_PATH =
-      "./runners/browser_templates/browser_test.html";
-
-  /// Dart test file that sets the test Configuration before starting the unit
-  /// tests.
-  static const String DART_TEST_FILE_TEMPLATE_PATH =
-      "./runners/browser_templates/browser_test.dart.template";
-
   /// Constructor.
   BrowserTestRunnerCodeGenerator(dartProject) : super(dartProject);
 
@@ -198,21 +189,21 @@ class BrowserTestRunnerCodeGenerator extends TestRunnerCodeGenerator {
   Future createTestHtmlFile(String testFileName, [String testHtmlFilePath]) {
     Completer completer = new Completer();
 
-    File htmlFile;
+    Future<String> htmlFileReader;
 
     if (testHtmlFilePath == null || testHtmlFilePath == "") {
       // If the test does not have an associated test file we'll call the test
       // file inside of a default HTML file.
-      htmlFile = new File(
-          Platform.script.resolve(DEFAULT_HTML_TEST_FILE_PATH).toFilePath());
+      htmlFileReader = (new Completer<String>()
+          ..complete(BROWSER_TEST_HTML_FILE_TEMPLATE)).future;
 
     } else {
       // Custom HTML test files.
-      htmlFile = new File(testHtmlFilePath);
+      htmlFileReader = new File(testHtmlFilePath).readAsString();
     }
 
     // Read the content of the file.
-    htmlFile.readAsString().then((String htmlFileString) {
+    htmlFileReader.then((String htmlFileString) {
 
       if (testHtmlFilePath == null || testHtmlFilePath == "") {
         htmlFileString =
@@ -249,31 +240,25 @@ class BrowserTestRunnerCodeGenerator extends TestRunnerCodeGenerator {
 
   /// Creates the intermediary Dart file that sets the unittest [Configuration].
   Future createTestDartFile(String testFileName) {
-    Completer completer = new Completer();
 
     // Read the content fo the template Dart file.
-    File intermediaryDartFile = new File(
-        Platform.script.resolve(DART_TEST_FILE_TEMPLATE_PATH).toFilePath());
-    intermediaryDartFile.readAsString().then((String dartFileString) {
+    String dartFileString = BROWSER_TEST_DART_FILE_TEMPLATE;
 
-      // Replaces templated values.
-      dartFileString =
-          dartFileString.replaceAll("{{test_file_name}}", testFileName);
+    // Replaces templated values.
+    dartFileString =
+        dartFileString.replaceAll("{{test_file_name}}", testFileName);
 
-      // Create the file (and delete it if it already exists).
-      String generatedFilePath = '${generatedTestFilesDirectory.path}/'
-          '$testFileName';
-      File generatedFile = new File(generatedFilePath);
-      if (generatedFile.existsSync()) {
-        generatedFile.deleteSync();
-      }
-      generatedFile.createSync(recursive: true);
+    // Create the file (and delete it if it already exists).
+    String generatedFilePath = '${generatedTestFilesDirectory.path}/'
+        '$testFileName';
+    File generatedFile = new File(generatedFilePath);
 
-      // Write into the [File].
-      generatedFile.writeAsStringSync(dartFileString);
-      completer.complete();
-    });
+    if (generatedFile.existsSync()) {
+      generatedFile.deleteSync();
+    }
+    generatedFile.createSync(recursive: true);
 
-    return completer.future;
+    // Write into the [File].
+    return generatedFile.writeAsString(dartFileString);
   }
 }

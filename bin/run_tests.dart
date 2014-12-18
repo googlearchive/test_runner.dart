@@ -4,24 +4,14 @@
 
 library test_runner;
 
-import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 import 'package:ansicolor/ansicolor.dart';
-import 'package:coverage/src/devtools.dart';
-import 'package:coverage/src/util.dart';
-import 'package:path/path.dart' as path;
-import 'package:unittest/unittest.dart';
 import 'package:unscripted/unscripted.dart';
-import 'package:yaml/yaml.dart';
 
-part 'dart_project.dart';
-part 'dart_binaries.dart';
-part 'test_configuration.dart';
-part 'runners/test_runner.dart';
-part 'runners/vm_test_runner.dart';
-part 'runners/browser_test_runner.dart';
-
+import 'package:test_runner/dart_project.dart';
+import 'package:test_runner/dart_binaries.dart';
+import 'package:test_runner/test_configuration.dart';
+import 'package:test_runner/test_runner.dart';
 
 /// Entry point which simply calls [runTests] with the command line arguments.
 main(arguments) => declare(runTests).execute(arguments);

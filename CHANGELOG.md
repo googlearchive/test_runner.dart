@@ -12,3 +12,9 @@ Runner package.
 
 - Now using Code Generation to make sure unittests are ran in a correct
   environment. Basically we set the unittest configuration.
+
+#### Version 0.2.1 ####
+
+- Fixes to have the test runner work with `pub global activate` and `pub global
+  run`.
+- Moved a lot of the code under `lib`.
