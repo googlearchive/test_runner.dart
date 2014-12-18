@@ -62,7 +62,7 @@ The exit code will be:
 
 ## Test files detection and conventions
 
-Your tests have to follow certain conventions to be reliably detected by TRD.
+Your tests have to follow certain conventions to be reliably detected by DTR.
 Please make sure that:
 
  - Your tests files are suffixed with `_test.dart`
@@ -99,7 +99,7 @@ You don't have to write an HTML file associated to your browser tests. The Dart
 test runner will automatically use a default HTML file and run your Browser
 tests in it if you didn;t provide a custom one.
 
-TRD will automatically detect if a test file needs to be ran inside a Browser if
+DTR will automatically detect if a test file needs to be ran inside a Browser if
 there is no associated HTML file.
 
 NOTE: Typically if you wrote browser tests using the
@@ -110,8 +110,8 @@ appropriate test `Configuration` and will import
 
 ## Tools and environment
 
-TRD only runs on Linux and Mac OS X. We're looking into enabling Windows at a
-later date. TRD also needs the following tools installed:
+DTR only runs on Linux and Mac OS X. We're looking into enabling Windows at a
+later date. DTR also needs the following tools installed:
 
  - Content Shell: A headless version of Dartium.
  - Dart SDK: Especially the `pub` command which will be used to run and serve
