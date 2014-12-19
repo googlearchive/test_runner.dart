@@ -3,6 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'package:unittest/unittest.dart';
+import 'package:unittest/html_enhanced_config.dart';
 
 int _partition(List array, int left, int right, int pivotIndex) {
   var pivotValue = array[pivotIndex];
@@ -37,8 +38,7 @@ List quickSort(List array) {
 }
 
 void main() {
-  // TODO: Remove when https://code.google.com/p/dart/issues/detail?id=21644 is fixed.
-  //useHtmlEnhancedConfiguration();
+  useHtmlEnhancedConfiguration();
   test('QuickSort', () =>
       expect(quickSort([5, 4, 3, 2, 1]), orderedEquals([1, 2, 3, 4, 5])));
   test('Partition', () {
