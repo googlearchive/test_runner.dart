@@ -148,10 +148,14 @@ runTests(
           print(redPen("Test failed: ${result.test.testFileName}"));
         }
         if (verbose || !result.success) {
-          print(underlinePen("Result of test: ${result.test.testFileName}"));
-          print(result.testOutput.trim());
+          print(underlinePen("Results of test: ${result.test.testFileName}"));
+          print(result.testOutput.trim()
+              .replaceAll(new RegExp(r"^"), "  ")
+              .replaceAll("\n", "\n  "));
           if (result.testErrorOutput.trim() != "")
-            print(redPen(result.testErrorOutput.trim()));
+            print(redPen(result.testErrorOutput.trim()
+                .replaceAll(new RegExp(r"^"), "  ")
+                .replaceAll("\n", "\n  ")));
         }
       })
 
