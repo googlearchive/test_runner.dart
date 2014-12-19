@@ -109,7 +109,7 @@ runTests(
 
   // Step 3: Detect all unit tests and extract their configuration.
 
-  print("\nLooking for test files...");
+  print("\nLooking for test suites...");
   try {
     dartProject.findTests(tests);
   } catch (e) {
@@ -126,7 +126,7 @@ runTests(
 
     List<TestConfiguration> browserTests = tests.where(
         (TestConfiguration t) => t.testType is BrowserTest).toList();
-    print(greenPen("Found ${tests.length} test files:"));
+    print(greenPen("Found ${tests.length} test suites:"));
     print(greenPen(" - ${tests.length - browserTests.length} Standalone VM"));
     print(greenPen(" - ${browserTests.length} Dartium"));
 
@@ -143,12 +143,12 @@ runTests(
         // As soon as each test is finished we display the results.
         if (verbose) print("");
         if (result.success) {
-          print(greenPen("Test passed: ${result.test.testFileName}"));
+          print(greenPen("Test suite passed: ${result.test.testFileName}"));
         } else {
-          print(redPen("Test failed: ${result.test.testFileName}"));
+          print(redPen("Test suite failed: ${result.test.testFileName}"));
         }
         if (verbose || !result.success) {
-          print(underlinePen("Results of test: ${result.test.testFileName}"));
+          print(underlinePen("Detailed results of test suite: ${result.test.testFileName}"));
           print(result.testOutput.trim()
               .replaceAll(new RegExp(r"^"), "  ")
               .replaceAll("\n", "\n  "));
@@ -170,18 +170,18 @@ runTests(
         List<TestExecutionResult> failedTestResults =
             results.where((TestExecutionResult t) => !t.success).toList();
         if (failedTestResults.length == 0) {
-          print(greenPen("\nSummary: ALL ${tests.length} TEST FILE(S) "
+          print(greenPen("\nSummary: ALL ${tests.length} TEST SUITE(S) "
               "PASSED.\n"));
           exit(0);
         } else if (failedTestResults.length == tests.length) {
-          print(redPen("\nSummary: ALL ${failedTestResults.length} TEST FILE(S)"
+          print(redPen("\nSummary: ALL ${failedTestResults.length} TEST SUITE(S)"
               " FAILED.\n"));
           exit(1);
         } else {
           print("\nSummary: "
-              + redPen("${failedTestResults.length} TEST FILE(S) FAILED. ")
+              + redPen("${failedTestResults.length} TEST SUITE(S) FAILED. ")
               + greenPen("${tests.length - failedTestResults.length} TEST "
-                  "FILE(S) PASSED.\n"));
+                  "SUITE(S) PASSED.\n"));
           exit(1);
         }
       });
