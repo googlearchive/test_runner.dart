@@ -66,6 +66,7 @@ class BrowserTestRunner extends TestRunner {
                 TestExecutionResult result = new TestExecutionResult(test);
                 result.success = testProcessResult.stdout.contains("PASS\n");
                 result.testOutput = testProcessResult.stdout
+                    .replaceAll("unittest-suite-wait-for-done", "")
                     .replaceAll("#EOF", "")
                     .replaceAll("#READY", "")
                     .replaceAll("CONSOLE MESSAGE: Warning: The "

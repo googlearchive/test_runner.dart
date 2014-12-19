@@ -39,7 +39,8 @@ class VmTestRunner extends TestRunner {
         (ProcessResult testProcess) {
           TestExecutionResult result = new TestExecutionResult(test);
           result.success = testProcess.exitCode == 0;
-          result.testOutput = testProcess.stdout;
+          result.testOutput = testProcess.stdout
+              .replaceAll("unittest-suite-wait-for-done", "");
           result.testErrorOutput = testProcess.stderr;
           completer.complete(result);
         }
