@@ -68,6 +68,9 @@ class BrowserTestRunner extends TestRunner {
                 result.testOutput = testProcessResult.stdout
                     .replaceAll("#EOF", "")
                     .replaceAll("#READY", "")
+                    .replaceAll("CONSOLE MESSAGE: Warning: The "
+                        "unittestConfiguration has already been set. New "
+                        "unittestConfiguration ignored.", "")
                     .replaceAll("Content-Type: text/plain", "");
                 result.testErrorOutput = testProcessResult.stderr
                     .replaceAll("#EOF", "");
