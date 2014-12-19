@@ -57,9 +57,9 @@ TIP: use the `-c` option to get a nice colored output
 The exit code will be:
 
  - If all tests passed: `0`
- - If a test file has failed: `1`
- - Incorrect command line argument (missing dependency like `pub` or `dart2js`, incorrect project path...): `2`
- - If a no test files were found in the project: `3`
+ - If a test has failed: `1`
+ - Incorrect command line argument (e.g. missing `pub` or `dart2js`, incorrect project path...): `2`
+ - If no test files were found in the project: `3`
 
 ## Test files detection and conventions
 
