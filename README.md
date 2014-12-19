@@ -97,7 +97,7 @@ have the same base name (for `my_test.dart` use `my_test.html`).
 
 You don't have to write an HTML file associated to your browser tests. The Dart
 test runner will automatically use a default HTML file and run your Browser
-tests in it if you didn;t provide a custom one.
+tests in it if you didn't provide a custom one.
 
 DTR will automatically detect if a test file needs to be ran inside a Browser if
 there is no associated HTML file.
