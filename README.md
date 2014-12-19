@@ -44,11 +44,22 @@ Here is an example of output from the Dart test runner:
      - 2 Dartium
 
     Running all tests...
+    Test passed: /vm_ok_test.dart
+    Test passed: /subdir/vm_in_subdir_ok_test.dart
+    Test failed: /vm_fail_test.dart
+    Result of test: vm_fail_test.dart
+    FAIL: QuickSort
+      Expected: equals [1, 2, 3, 4, 5] ordered
+        Actual: [3, 5, 2, 4, 1]
+         Which: was <3> instead of <1> at location [0]
+      ...
+    FAIL: Partition
+      Expected: <1>
+        Actual: <0>
+      ...
+    0 PASSED, 2 FAILED, 0 ERRORS
     Test passed: /browser_ok_test.dart
     Test passed: /browser_ok_with_html_test.dart
-    Test passed: /subdir/vm_in_subdir_ok_test.dart
-    Test passed: /vm_ok_test.dart
-    Test failed: /vm_fail_test.dart
 
     Summary: 1 TEST FILE(S) FAILED. 4 TEST FILE(S) PASSED.
 
