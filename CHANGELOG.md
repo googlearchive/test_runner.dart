@@ -3,6 +3,10 @@
 This file contains highlights of what changes on each version of the Dart Test
 Runner package.
 
+#### Version 0.2.3 ####
+
+- Tweaked command line output. Now show failed test suite details by default.
+
 #### Version 0.2.2 ####
 
 - Exit code `3` if no test files were found.
