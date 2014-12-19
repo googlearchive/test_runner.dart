@@ -58,7 +58,8 @@ The exit code will be:
 
  - If all tests passed: `0`
  - If a test file has failed: `1`
- - If a test runner error happened: `2`
+ - Incorrect command line argument (missing dependency like `pub` or `dart2js`, incorrect project path...): `2`
+ - If a no test files were found in the project: `3`
 
 ## Test files detection and conventions
 

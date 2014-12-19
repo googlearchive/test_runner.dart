@@ -117,6 +117,13 @@ runTests(
     exit(2);
   }
   dartProject.tests.toList().then((List<TestConfiguration> tests) {
+
+    // Error if no tests were found.
+    if (tests == null || tests.length == 0) {
+      stderr.writeln(redPen("No tests files were found.\n"));
+      exit(3);
+    }
+
     List<TestConfiguration> browserTests = tests.where(
         (TestConfiguration t) => t.testType is BrowserTest).toList();
     print(greenPen("Found ${tests.length} test files:"));
