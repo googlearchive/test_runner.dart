@@ -50,7 +50,7 @@ Here is an example of output from the Dart test runner:
     Test passed: /vm_ok_test.dart
     Test failed: /vm_fail_test.dart
 
-    SUMMARY: 1 TEST FILES FAILED. 4 TEST FILES PASSED.
+    Summary: 1 TEST FILE(S) FAILED. 4 TEST FILE(S) PASSED.
 
 TIP: use the `-c` option to get a nice colored output
 
