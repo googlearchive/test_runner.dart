@@ -38,16 +38,16 @@ Here is an example of output from the Dart test runner:
     Looking for Dart project in "./"...
     Found project "test-runner".
 
-    Looking for test files...
-    Found 5 test files:
+    Looking for test suites...
+    Found 5 test suites:
      - 3 Standalone VM
      - 2 Dartium
 
     Running all tests...
-    Test passed: /vm_ok_test.dart
-    Test passed: /subdir/vm_in_subdir_ok_test.dart
-    Test failed: /vm_fail_test.dart
-    Result of test: vm_fail_test.dart
+    Test suite passed: /vm_ok_test.dart
+    Test suite passed: /subdir/vm_in_subdir_ok_test.dart
+    Test suite failed: /vm_fail_test.dart
+    Detailed results of test suite: vm_fail_test.dart
       FAIL: QuickSort
         Expected: equals [1, 2, 3, 4, 5] ordered
           Actual: [3, 5, 2, 4, 1]
@@ -58,17 +58,17 @@ Here is an example of output from the Dart test runner:
           Actual: <0>
         ...
       0 PASSED, 2 FAILED, 0 ERRORS
-    Test passed: /browser_ok_test.dart
-    Test passed: /browser_ok_with_html_test.dart
+    Test suite passed: /browser_ok_test.dart
+    Test suite passed: /browser_ok_with_html_test.dart
 
-    Summary: 1 TEST FILE(S) FAILED. 4 TEST FILE(S) PASSED.
+    Summary: 1 TEST SUITE(S) FAILED. 4 TEST SUITE(S) PASSED.
 
 TIP: use the `-c` option to get a nice colored output
 
 The exit code will be:
 
  - If all tests passed: `0`
- - If a test has failed: `1`
+ - If at least one test has failed: `1`
  - Incorrect command line argument (e.g. missing `pub` or `dart2js`, incorrect project path...): `2`
  - If no test files were found in the project: `3`
 
@@ -82,6 +82,8 @@ Please make sure that:
 
 Depending on the environment into which your test runs there are additional
 requirements listed below.
+
+Each test file is considered a "test suite".
 
 ### Standalone VM tests
 
