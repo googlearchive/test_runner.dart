@@ -15,7 +15,7 @@ To install DTR use this command:
 
 To run DTR use this command from within the root of your Dart project:
 
-    pub global run test_runner:run_tests
+    pub global run test_runner
 
 Alternatively you can add the pub cache `bin` directory to your PATH:
 `~/.pub-cache/bin`. Then you will be able to simply use:

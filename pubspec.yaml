@@ -13,3 +13,4 @@ dependencies:
   path: ">=1.3.0 <2.0.0"
 executables:
   run_tests:
+  test_runner:
