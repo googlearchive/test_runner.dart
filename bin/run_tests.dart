@@ -141,17 +141,17 @@ runTests(
 
       ..listen((TestExecutionResult result) {
         // As soon as each test is finished we display the results.
-        if (verbose) {
-          print(underlinePen("\nResult of test: ${result.test.testFileName}"));
-          print(result.testOutput.trim());
-          if (result.testErrorOutput.trim() != "")
-            print(redPen(result.testErrorOutput.trim()));
-        }
-
+        if (verbose) print("");
         if (result.success) {
           print(greenPen("Test passed: ${result.test.testFileName}"));
         } else {
           print(redPen("Test failed: ${result.test.testFileName}"));
+        }
+        if (verbose || !result.success) {
+          print(underlinePen("Result of test: ${result.test.testFileName}"));
+          print(result.testOutput.trim());
+          if (result.testErrorOutput.trim() != "")
+            print(redPen(result.testErrorOutput.trim()));
         }
       })
 
