@@ -48,16 +48,17 @@ Here is an example of output from the Dart test runner:
     Test suite passed: /subdir/vm_in_subdir_ok_test.dart
     Test suite failed: /vm_fail_test.dart
     Detailed results of test suite: vm_fail_test.dart
-      FAIL: QuickSort
-        Expected: equals [1, 2, 3, 4, 5] ordered
-          Actual: [3, 5, 2, 4, 1]
-           Which: was <3> instead of <1> at location [0]
-        ...
-      FAIL: Partition
-        Expected: <1>
-          Actual: <0>
-        ...
-      0 PASSED, 2 FAILED, 0 ERRORS
+    ┌────────────────────────────────────────────────
+    │ FAIL: QuickSort
+    │   Expected: equals [1, 2, 3, 4, 5] ordered
+    │     Actual: [3, 5, 2, 4, 1]
+    │      Which: was <3> instead of <1> at location [0]
+    │   ...
+    │ FAIL: Partition
+    │   Expected: <1>
+    │     Actual: <0>
+    │   ...
+    │ 0 PASSED, 2 FAILED, 0 ERRORS
     Test suite passed: /browser_ok_test.dart
     Test suite passed: /browser_ok_with_html_test.dart
 
