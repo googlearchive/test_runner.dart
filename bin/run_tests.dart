@@ -176,8 +176,8 @@ runTests(
               "PASSED.\n"));
           exit(0);
         } else if (failedTestResults.length == tests.length) {
-          print(redPen("\nSummary: ALL ${failedTestResults.length} TEST SUITE(S)"
-              " FAILED.\n"));
+          print(redPen("\nSummary: ALL ${failedTestResults.length} "
+             "TEST SUITE(S) FAILED.\n"));
           exit(1);
         } else {
           print("\nSummary: "
