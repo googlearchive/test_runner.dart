@@ -47,7 +47,7 @@ Here is an example of output from the Dart test runner:
     Test suite passed: /vm_ok_test.dart
     Test suite passed: /subdir/vm_in_subdir_ok_test.dart
     Test suite failed: /vm_fail_test.dart
-    Detailed results of test suite: vm_fail_test.dart
+    Detailed results of test suite vm_fail_test.dart:
     ┌────────────────────────────────────────────────
     │ FAIL: QuickSort
     │   Expected: equals [1, 2, 3, 4, 5] ordered
