@@ -148,7 +148,7 @@ runTests(
           print(redPen("Test suite failed: ${result.test.testFileName}"));
         }
         if (verbose || !result.success) {
-          print("Detailed results of test suite: ${result.test.testFileName}");
+          print("Detailed results of test suite ${result.test.testFileName}:");
           print("┌───────────────────────────────"
               "${result.test.testFileName.replaceAll(new RegExp(r'.'), '─')}");
           print(result.testOutput.trim()
