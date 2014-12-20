@@ -148,14 +148,16 @@ runTests(
           print(redPen("Test suite failed: ${result.test.testFileName}"));
         }
         if (verbose || !result.success) {
-          print(underlinePen("Detailed results of test suite: ${result.test.testFileName}"));
+          print("Detailed results of test suite: ${result.test.testFileName}");
+          print("┌───────────────────────────────"
+              "${result.test.testFileName.replaceAll(new RegExp(r'.'), '─')}");
           print(result.testOutput.trim()
-              .replaceAll(new RegExp(r"^"), "  ")
-              .replaceAll("\n", "\n  "));
+              .replaceAll(new RegExp(r"^"), "│ ")
+              .replaceAll("\n", "\n│ "));
           if (result.testErrorOutput.trim() != "")
             print(redPen(result.testErrorOutput.trim()
-                .replaceAll(new RegExp(r"^"), "  ")
-                .replaceAll("\n", "\n  ")));
+                .replaceAll(new RegExp(r"^"), "│ ")
+                .replaceAll("\n", "\n│ ")));
         }
       })
 
