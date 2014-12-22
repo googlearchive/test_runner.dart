@@ -79,7 +79,7 @@ Your tests have to follow certain conventions to be reliably detected by DTR.
 Please make sure that:
 
  - Your tests files are suffixed with `_test.dart`
- - Your test contain a `main()` that runs all your unit tests.
+ - Each test file contains a `main()` that runs all your unit tests.
 
 Depending on the environment into which your test runs there are additional
 requirements listed below.
@@ -178,7 +178,7 @@ Runs all unit tests of the Dart project located at `~/my_project/`:
 Runs all tests of the project located at `~/my_project/` and use
 `~/dartium/content_hell` as the Dartium executable.
 
-    run_tests --content-shell-bin ~/dartium/content_hell ~/my_project/
+    run_tests --content-shell-bin ~/dartium/content_shell ~/my_project/
 
 ## License
 
