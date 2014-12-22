@@ -89,10 +89,10 @@ Each test file is considered a "test suite".
 ### Standalone VM tests
 
 Standalone VM tests are tests that can be run from the command line using
-'dart'. The executable of the test needs to return an exit code of 1 if there
-was an error and 0 if all tests were successful.
+'dart'. The executable of the test needs to return an exit code of 0 if all tests
+were successful and 1 or more if there was an error.
 
-NOTE: Typically if you wrote browser tests using the
+NOTE: Typically if you wrote your Standalone VM tests using the
 [unittest package](https://pub.dartlang.org/packages/unittest) you should be all
 set.
 
