@@ -24,24 +24,24 @@ class DartBinaries {
   /// Checks that all the binaries are accessible and working.
   /// If some binaries are not pin the PATH a [ArgumentError] will be thrown.
   checkBinaries() {
-    pubBin = _checkBinary(pubBin, "--pub-bin", "pub");
+    pubBin = _checkBinary(pubBin, "--pub-bin", "pub", "Pub");
     contentShellBin = _checkBinary(contentShellBin, "--content-shell-bin",
-                                   "content_shell");
-    dart2jsBin = _checkBinary(dart2jsBin, "--dart2js-bin", "dart2js");
+                                   "content_shell", "Content Shell");
+    dart2jsBin = _checkBinary(dart2jsBin, "--dart2js-bin", "dart2js", "dart2js");
   }
 
   /// Checks if the given [command] is in the PATH and returns the path to the
   /// command.
   String _checkBinary(String command, String cmdAttributeName,
-                      String defaultCmd) {
+                      String defaultCmd, String programName) {
     ProcessResult whichCmdPr = Process.runSync('which', [command]);
     if(whichCmdPr.exitCode == 0) {
       return whichCmdPr.stdout.trim();
     } else {
       throw new ArgumentError('"$command" is not an executable binary and could'
-          ' not be found in the PATH. Please specify the path to the Pub '
-          'executable using the ${cmdAttributeName} parameter or by adding '
-          '"${defaultCmd}" to the PATH.');
+          ' not be found in the PATH. Please specify the path to the '
+          '$programName executable using the ${cmdAttributeName} parameter or '
+          'by adding "${defaultCmd}" to the PATH.');
     }
   }
 
