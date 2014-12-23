@@ -47,7 +47,7 @@ class BrowserTest extends Test {
                     this.htmlFilePath: null});
 }
 
-/// Indicates that the test is to be ran in a  Server side/Command line
+/// Indicates that the test is to be ran in a Server side/Command line
 /// environment. This should be used to annotate a test file [main] function.
 ///
 /// Note: a single test can be annotated multiple times with [BrowserTest] and

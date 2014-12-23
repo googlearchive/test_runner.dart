@@ -54,7 +54,7 @@ class DartProject {
     projectPath = projectDirectory.path;
 
     // If the dart project path is a "/test" folder we look up.
-    if(path.basename(projectDirectory.path) == "test") {
+    if (path.basename(projectDirectory.path) == "test") {
       projectDirectory = projectDirectory.parent;
       projectPath = projectDirectory.path + "/";
     }

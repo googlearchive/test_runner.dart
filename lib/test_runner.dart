@@ -165,7 +165,7 @@ abstract class TestRunnerCodeGenerator {
     Directory newGeneratedSourceDir =
         new Directory(generatedTestFilesDirectoryPath);
 
-    if(newGeneratedSourceDir.existsSync()) {
+    if (newGeneratedSourceDir.existsSync()) {
       newGeneratedSourceDir.deleteSync(recursive: true);
       return true;
     }
