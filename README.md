@@ -79,7 +79,7 @@ Your tests have to follow certain conventions to be reliably detected by DTR.
 Please make sure that:
 
  - Your tests files are suffixed with `_test.dart`
- - Your test contain a `main()` that runs all your unit tests.
+ - Each test file contains a `main()` that runs all your unit tests.
 
 Depending on the environment into which your test runs there are additional
 requirements listed below.
@@ -89,10 +89,10 @@ Each test file is considered a "test suite".
 ### Standalone VM tests
 
 Standalone VM tests are tests that can be run from the command line using
-'dart'. The executable of the test needs to return an exit code of 1 if there
-was an error and 0 if all tests were successful.
+'dart'. The executable of the test needs to return an exit code of 0 if all tests
+were successful and 1 or more if there was an error.
 
-NOTE: Typically if you wrote browser tests using the
+NOTE: Typically if you wrote your Standalone VM tests using the
 [unittest package](https://pub.dartlang.org/packages/unittest) you should be all
 set.
 
@@ -178,7 +178,7 @@ Runs all unit tests of the Dart project located at `~/my_project/`:
 Runs all tests of the project located at `~/my_project/` and use
 `~/dartium/content_hell` as the Dartium executable.
 
-    run_tests --content-shell-bin ~/dartium/content_hell ~/my_project/
+    run_tests --content-shell-bin ~/dartium/content_shell ~/my_project/
 
 ## License
 
