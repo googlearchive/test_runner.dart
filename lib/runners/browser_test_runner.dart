@@ -161,7 +161,6 @@ class BrowserTestRunner extends TestRunner {
     });
   }
 
-
   /// Returns a JSON object containing code coverage data for all Isolates given
   /// an [Observatory].
   // This is experimental.

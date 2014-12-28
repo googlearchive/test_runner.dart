@@ -42,7 +42,7 @@ class DartBinaries {
   String _checkBinary(String command, String cmdAttributeName,
                       String defaultCmd, String programName) {
     ProcessResult whichCmdPr = Process.runSync('which', [command]);
-    if(whichCmdPr.exitCode == 0) {
+    if (whichCmdPr.exitCode == 0) {
       return whichCmdPr.stdout.trim();
     } else {
       throw new ArgumentError('"$command" is not an executable binary and could'
@@ -53,7 +53,7 @@ class DartBinaries {
   }
 
   /// Returns [true] if the Dart file at the given [dartFilePath] needs to be
-  /// ran in a browser environment.
+  /// run in a browser environment.
   Future<bool> isDartFileBrowserOnly(String dartFilePath) {
     Completer<bool> completer = new Completer();
     Process.run(dart2jsBin,
