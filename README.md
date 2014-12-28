@@ -70,7 +70,8 @@ The exit code will be:
 
  - If all tests passed: `0`
  - If at least one test has failed: `1`
- - Incorrect command line argument (e.g. missing `pub` or `dart2js`, incorrect project path...): `2`
+ - Incorrect command line argument (e.g. missing `pub` or `dart2js`, incorrect
+   project path...): `2`
  - If no test files were found in the project: `3`
 
 ## Test files detection and conventions
@@ -89,8 +90,8 @@ Each test file is considered a "test suite".
 ### Standalone VM tests
 
 Standalone VM tests are tests that can be run from the command line using
-'dart'. The executable of the test needs to return an exit code of 0 if all tests
-were successful and 1 or more if there was an error.
+'dart'. The executable of the test needs to return an exit code of 0 if all
+tests were successful and 1 or more if there was an error.
 
 NOTE: Typically if you wrote your Standalone VM tests using the
 [unittest package](https://pub.dartlang.org/packages/unittest) you should be all
@@ -128,7 +129,7 @@ appropriate test `Configuration` and will import
 DTR only runs on Linux and Mac OS X. We're looking into enabling Windows at a
 later date. DTR also needs the following tools installed:
 
- - Content Shell: A headless version of Dartium.
+ - Content Shell: A headless version of Dartium. Needed to run browser tests.
  - Dart SDK: Especially the `pub` command which will be used to run and serve
    tests and `dart2js` which is used to detect browser tests.
 
@@ -145,15 +146,18 @@ Generic usage of DTR:
     run_tests [options] [<project-or-tests>...]
 
 Where `<project-or-tests>` is the path to the project root/test folder or a list
-of path to individual test files to run. If omitted all tests of the current project will be discovered and ran.
+of path to individual test files to run. If omitted all tests of the current
+project will be discovered and ran.
 
 ### Options
 
-`--content-shell-bin`: Path to the Content Shell executable. If omitted "content_shell" from env is used.
+`--content-shell-bin`: Path to the Content Shell executable. If omitted
+"content_shell" from env is used.
 
 `--pub-bin`: Path to the Pub executable. If omitted "pub" from env is used.
 
-`--dart2js`: Path to the dart2js executable. If omitted "dart2js" from env is used.
+`--dart2js`: Path to the dart2js executable. If omitted "dart2js" from env is
+used.
 
 `--skip-browser-tests`: Skips all browser tests. Useful when browser binaries
 like content_shell are not available.
@@ -166,7 +170,8 @@ like content_shell are not available.
 
 ### Examples
 
-Runs all unit tests of the project in the current directory with a colored output:
+Runs all unit tests of the project in the current directory with a colored
+output:
 
     run_tests -c
 
