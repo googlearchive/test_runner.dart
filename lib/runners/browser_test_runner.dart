@@ -52,7 +52,6 @@ class BrowserTestRunner extends TestRunner {
 
       String testUrl = buildBrowserTestUrl(test.testFileName);
 
-      // TODO: Have a timer stop this after a fixed amount of time.
       Process
           .run(dartBinaries.contentShellBin,
               ["--args", "--dump-render-tree", "--disable-gpu",

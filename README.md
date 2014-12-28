@@ -85,7 +85,8 @@ Please make sure that:
 Depending on the environment into which your test runs there are additional
 requirements listed below.
 
-Each test file is considered a "test suite".
+Each test file is considered a "test suite". If a test suites does not complete
+in 240 seconds it is aborted.
 
 ### Standalone VM tests
 

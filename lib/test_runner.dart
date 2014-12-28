@@ -60,6 +60,9 @@ class TestExecutionResult {
 /// Properly dispatch running tests to the correct [TestRunner].
 class TestRunnerDispatcher {
 
+  /// Number of seconds to wait until the test times out.
+  static const int TESTS_TIMEOUT_SEC = 240;
+
   /// Pointers to all Dart SDK binaries.
   DartBinaries dartBinaries;
 
@@ -96,7 +99,15 @@ class TestRunnerDispatcher {
 
       // Execute test and send result to the stream.
       Future<TestExecutionResult> stuff = testRunner
-          .runTest(test)..then((TestExecutionResult result) {
+          .runTest(test)
+          // Kill the test after a set amount of time. Timeout.
+          .timeout(new Duration(seconds: TESTS_TIMEOUT_SEC), onTimeout: () {
+            TestExecutionResult result = new TestExecutionResult(test);
+            result.success = false;
+            result.testOutput = "The test did not complete in less than "
+                                "$TESTS_TIMEOUT_SEC seconds. It was aborted.";
+            return result;
+          })..then((TestExecutionResult result) {
             controller.add(result);
           });
 

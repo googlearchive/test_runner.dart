@@ -3,6 +3,10 @@
 This file contains highlights of what changes on each version of the Dart Test
 Runner package.
 
+#### Version 0.2.5 ####
+
+- If a test suite does not complete in 240 seconds it is aborted.
+
 #### Version 0.2.4 ####
 
 - If no browser tests are detected `content_shell` won't be needed.
