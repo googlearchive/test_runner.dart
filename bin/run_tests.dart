@@ -184,13 +184,18 @@ runTests(
           print("Detailed results of test suite ${result.test.testFileName}:");
           print("┌───────────────────────────────"
               "${result.test.testFileName.replaceAll(new RegExp(r'.'), '─')}");
-          print(result.testOutput.trim()
+          if (result.testOutput.trim() != ""
+              || result.testErrorOutput.trim() != "") {
+            print(result.testOutput.trim()
+            .replaceAll(new RegExp(r"^"), "│ ")
+            .replaceAll("\n", "\n│ "));
+            if (result.testErrorOutput.trim() != "")
+              print(result.testErrorOutput.trim()
               .replaceAll(new RegExp(r"^"), "│ ")
               .replaceAll("\n", "\n│ "));
-          if (result.testErrorOutput.trim() != "")
-            print(redPen(result.testErrorOutput.trim()
-                .replaceAll(new RegExp(r"^"), "│ ")
-                .replaceAll("\n", "\n│ ")));
+          } else {
+            print("│ There was no test output.");
+          }
         }
       })
 
