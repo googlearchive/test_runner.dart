@@ -27,21 +27,29 @@ var underlinePen = (String s) => s;
 
 // All metadata annotations are optional.
 @Command(help: 'Runs Dart unit tests')
-@ArgExample('', help: 'Runs all unit tests of the project in the current directory')
+@ArgExample('', help: 'Runs all unit tests of the project in the current '
+                      'directory')
 @ArgExample('tests/test1.dart tests/test2.dart',
-    help: 'Runs the specified unit test files of the project in the current directory')
+    help: 'Runs the specified unit test files of the project in the current '
+          'directory')
 @ArgExample('--project-path ~/my_project/',
     help: 'Runs all unit tests of the project located at ~/my_project/')
 @ArgExample('--content-shell-bin ~/dartium/content_hell -p ~/my_project/',
-    help: 'Runs all tests of the project located at ~/my_project/. Sets ~/dartium/content_shell as the Content Shell executable.')
+    help: 'Runs all tests of the project located at ~/my_project/. Sets '
+          '~/dartium/content_shell as the Content Shell executable.')
 runTests(
-    @Rest(help: 'Path to the project root/test folder or list of path to individual test files to run. If omitted all tests of the current project will be discovered and ran.')
+    @Rest(help: 'Path to the project root/test folder or list of path to '
+                'individual test files to run. If omitted all tests of the '
+                'current project will be discovered and ran.')
     List<String> projectOrTests,
-    {@Option(help: 'Path to the Content Shell executable. If omitted "content_shell" from env is used.')
+    {@Option(help: 'Path to the Content Shell executable. If omitted '
+                   '"content_shell" from env is used.')
     String contentShellBin: "content_shell",
-    @Option(help: 'Path to the Pub executable. If omitted "pub" from env is used.')
+    @Option(help: 'Path to the Pub executable. If omitted "pub" from env is '
+                  'used.')
     String pubBin: "pub",
-    @Option(help: 'Path to the dart2js executable. If omitted "dart2js" from env is used.')
+    @Option(help: 'Path to the dart2js executable. If omitted "dart2js" from '
+                  'env is used.')
     String dart2js: "dart2js",
     @Flag(abbr: 'c', help: 'Prints the output in color in a shell.')
     bool color : false,
