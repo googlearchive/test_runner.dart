@@ -155,6 +155,9 @@ of path to individual test files to run. If omitted all tests of the current pro
 
 `--dart2js`: Path to the dart2js executable. If omitted "dart2js" from env is used.
 
+`--skip-browser-tests`: Skips all browser tests. Useful when browser binaries
+like content_shell are not available.
+
 `-c` or `--color`: Prints the output in color in a shell.
 
 `-v` or `--verbose`: Prints all tests results instead of just the summary.

@@ -53,8 +53,12 @@ runTests(
     String dart2js: "dart2js",
     @Flag(abbr: 'c', help: 'Prints the output in color in a shell.')
     bool color : false,
-    @Flag(abbr: 'v', help: 'Prints all tests results instead of just the summary.')
-    bool verbose : false}) {
+    @Flag(abbr: 'v', help: 'Prints all tests results instead of just the '
+                           'summary.')
+    bool verbose : false,
+    @Flag(help: 'Skips all browser tests. Useful when browser binaries like '
+                'content_shell are not available.')
+    bool skipBrowserTests : false}) {
 
   // Make output pretty and colored if requested.
 
@@ -90,18 +94,18 @@ runTests(
     }
   }
 
-  // Step 1: Check if all binaries path have been set correctly.
+  // Step 1: Check if the SDK binaries path have been set correctly.
 
   DartBinaries dartBinaries =
       new DartBinaries(contentShellBin, pubBin, dart2js);
-  print("\nChecking Dart binaries...");
+  print("\nChecking Dart SDK binaries...");
   try {
-    dartBinaries.checkBinaries();
+    dartBinaries.checkDartSdkBinaries();
   } catch (e) {
     stderr.writeln(redPen("$e\n"));
     exit(2);
   }
-  print(greenPen("Dart binaries OK."));
+  print(greenPen("Dart SDK binaries OK."));
 
   // Step 2: Check if a Dart project can be found in [projectPathUri].
 
@@ -136,8 +140,29 @@ runTests(
         (TestConfiguration t) => t.testType is BrowserTest).toList();
     print(greenPen("Found ${tests.length} test suites:"));
     print(greenPen(" - ${tests.length - browserTests.length} Standalone VM"));
-    print(greenPen(" - ${browserTests.length} Dartium"));
+    print(greenPen(" - ${browserTests.length} Dartium") +
+          (skipBrowserTests ? redPen(" (Will be skipped!)") : ""));
 
+
+    // Step 3 bis: Check if browser binaries have been set correctly.
+
+    if (browserTests.length > 0 && !skipBrowserTests) {
+      print("\nChecking browser binaries...");
+      try {
+        dartBinaries.checkBrowserBinaries();
+      } catch (e) {
+        stderr.writeln(redPen("$e"));
+        stderr.writeln(redPen("You can choose to skip all browser tests by "
+            "using the --skip-browser-tests option and this binary won't be "
+            "needed.\n"));
+        exit(2);
+      }
+      print(greenPen("Browser binaries OK."));
+    } else if (skipBrowserTests) {
+      // If skipBrowserTests is true we remove all Browser tests.
+      tests = tests.where(
+          (TestConfiguration t) => !(t.testType is BrowserTest)).toList();
+    }
 
     // Step 4: Run all tests and catch their output so that we can print it on
     // the command line.
@@ -180,17 +205,17 @@ runTests(
         List<TestExecutionResult> failedTestResults =
             results.where((TestExecutionResult t) => !t.success).toList();
         if (failedTestResults.length == 0) {
-          print(greenPen("\nSummary: ALL ${tests.length} TEST SUITE(S) "
+          print(greenPen("\nSummary: ALL ${results.length} TEST SUITE(S) "
               "PASSED.\n"));
           exit(0);
-        } else if (failedTestResults.length == tests.length) {
+        } else if (failedTestResults.length == results.length) {
           print(redPen("\nSummary: ALL ${failedTestResults.length} "
              "TEST SUITE(S) FAILED.\n"));
           exit(1);
         } else {
           print("\nSummary: "
               + redPen("${failedTestResults.length} TEST SUITE(S) FAILED. ")
-              + greenPen("${tests.length - failedTestResults.length} TEST "
+              + greenPen("${results.length - failedTestResults.length} TEST "
                   "SUITE(S) PASSED.\n"));
           exit(1);
         }

@@ -21,13 +21,20 @@ class DartBinaries {
 
   DartBinaries(this.contentShellBin, this.pubBin, this.dart2jsBin);
 
-  /// Checks that all the binaries are accessible and working.
-  /// If some binaries are not pin the PATH a [ArgumentError] will be thrown.
-  checkBinaries() {
+  /// Checks that all the Dart SDK binaries are accessible and working.
+  /// If some binaries are not in the PATH a [ArgumentError] will be thrown.
+  checkDartSdkBinaries() {
     pubBin = _checkBinary(pubBin, "--pub-bin", "pub", "Pub");
+    dart2jsBin = _checkBinary(dart2jsBin, "--dart2js-bin",
+        "dart2js", "dart2js");
+  }
+
+  /// Checks that all the binaries needed for browser testing are accessible and
+  /// working.
+  /// If some binaries are not in the PATH a [ArgumentError] will be thrown.
+  checkBrowserBinaries() {
     contentShellBin = _checkBinary(contentShellBin, "--content-shell-bin",
-                                   "content_shell", "Content Shell");
-    dart2jsBin = _checkBinary(dart2jsBin, "--dart2js-bin", "dart2js", "dart2js");
+        "content_shell", "Content Shell");
   }
 
   /// Checks if the given [command] is in the PATH and returns the path to the
