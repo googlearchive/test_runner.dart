@@ -5,6 +5,7 @@
 library test_runner.test_configuration;
 
 import 'dart:io';
+import 'package:path/path.dart' as path;
 import 'dart_project.dart';
 
 // The classes below used as annotations to configure test files.
@@ -108,6 +109,6 @@ class TestConfiguration {
   String get testFileName {
     String absFilePath = new File(testFilePath).resolveSymbolicLinksSync();
     String absDirPath = dartProject.testDirectory.resolveSymbolicLinksSync();
-    return absFilePath.replaceFirst("$absDirPath/", "");
+    return path.relative(absFilePath, from: absDirPath).replaceAll(r'\', '/');
   }
 }

@@ -6,6 +6,7 @@ library test_runner.dart_binaries;
 
 import 'dart:async';
 import 'dart:io';
+import 'package:path/path.dart' as path;
 
 /// Holds pointers to Dart SDK binaries and offers convenience methods.
 class DartBinaries {
@@ -41,15 +42,63 @@ class DartBinaries {
   /// command.
   String _checkBinary(String command, String cmdAttributeName,
                       String defaultCmd, String programName) {
-    ProcessResult whichCmdPr = Process.runSync('which', [command]);
-    if (whichCmdPr.exitCode == 0) {
-      return whichCmdPr.stdout.trim();
-    } else {
+    String executablePath = _runWhich(command);
+    if (executablePath == null) {
       throw new ArgumentError('"$command" is not an executable binary and could'
           ' not be found in the PATH. Please specify the path to the '
           '$programName executable using the ${cmdAttributeName} parameter or '
           'by adding "${defaultCmd}" to the PATH.');
     }
+    return executablePath;
+  }
+
+  /// Runs the which [command] and returns the full path to the command, or null
+  /// in case the command was not found.
+  String _runWhich(String command) {
+    if (Platform.isWindows) {
+      if (path.extension(command).isNotEmpty) {
+        return _runWhichWindows(command);
+      }
+      // Command without extension, try exe and bat.
+      String executablePath = _runWhichWindows('$command.bat');
+
+      if (executablePath == null) {
+        executablePath = _runWhichWindows('$command.exe');
+      }
+
+      return executablePath;
+    } else {
+      return _runWhichUnix(command);
+    }
+  }
+
+  /// Runs the Unix which command for [command].
+  String _runWhichUnix(String command) {
+    ProcessResult whichCmdPr = Process.runSync('which', [command]);
+
+    if (whichCmdPr.exitCode == 0) {
+      return whichCmdPr.stdout.trim();
+    } else {
+      return null;
+    }
+  }
+
+  /// Runs a Windows emulation of the Unix which command for [command]. The
+  /// Windows version expect the full name of the executable including the
+  /// extension.
+  String _runWhichWindows(String command) {
+    ProcessResult whichCmdPr = Process.runSync(
+        'for %G in ($command) do @echo.%~\$PATH:G', [], runInShell: true);
+
+    if (whichCmdPr.exitCode == 0) {
+      String executable = whichCmdPr.stdout.trim();
+
+      if (executable.isNotEmpty) {
+        return executable;
+      }
+    }
+
+    return null;
   }
 
   /// Returns [true] if the Dart file at the given [dartFilePath] needs to be
