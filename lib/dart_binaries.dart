@@ -62,7 +62,7 @@ class DartBinaries {
       // TODO: When dart2js has fixed the issue with their exitcode we should
       //       rely on the exitcode instead of the stdout.
       completer.complete(dart2jsPr.stdout != null
-          && (dart2jsPr.stdout as String).trim().contains("Error"));
+          && (dart2jsPr.stdout as String).contains("Error: Library not found"));
     });
     return completer.future;
   }
