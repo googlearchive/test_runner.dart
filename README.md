@@ -157,7 +157,8 @@ Linux instructions comming soon.
 
 #### Windows
 
-Windows instructions comming soon.
+ - Unzip the archive into a folder
+ - Add the folder to your ```PATH```
 
 #### Mac OS X
 
