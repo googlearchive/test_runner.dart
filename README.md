@@ -127,16 +127,16 @@ appropriate test `Configuration` and will import
 
 ## Tools and environment
 
-DTR only runs on Linux and Mac OS X. We're looking into enabling Windows at a
-later date. DTR also needs the following tools installed:
+DTR runs on Linux, Mac OS X and Windows. DTR also needs the following tools installed:
 
  - Content Shell: A headless version of Dartium. Needed to run browser tests.
  - Dart SDK: Especially the `pub` command which will be used to run and serve
    tests and `dart2js` which is used to detect browser tests.
 
 Ideally make sure that these tools are available in your PATH as `pub`,
-`dart2js` and `content_shell`. You can also specify the path to these tools
-executable with `--content-shell-bin`, `--pub-bin` and `--dart2js-bin`.
+`dart2js` and `content_shell` (with a `.bat` or `.exe` extension in Windows).
+You can also specify the path to these tools executables with
+`--content-shell-bin`, `--pub-bin` and `--dart2js-bin`.
 
 ## Options and examples
 
