@@ -149,7 +149,7 @@ likely need to install it.
 
 To install Content Shell download the [correct archive for your environment]
 (http://gsdview.appspot.com/dart-archive/channels/dev/release/latest/dartium/) and follow
-the instructions for your environment below:
+the instructions for your environment:
 
 #### Linux
 
@@ -163,7 +163,7 @@ Windows instructions comming soon.
 
  - Unzip the archive and move the Content Shell.app file to your Application folder
  - Create a `content_shell` bash script in your `/usr/local/bin` folder (or another
-   folder that's in your `PATH`) as:
+   folder that's in your `PATH`) with the following content:
 ```
 #!/bin/bash
 "/Applications/Content Shell.app/Contents/MacOS/Content Shell" "$@"
