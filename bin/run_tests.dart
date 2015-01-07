@@ -187,10 +187,12 @@ runTests(
           if (result.testOutput.trim() != ""
               || result.testErrorOutput.trim() != "") {
             print(result.testOutput.trim()
+            .replaceAll("\r", "")
             .replaceAll(new RegExp(r"^"), "│ ")
             .replaceAll("\n", "\n│ "));
             if (result.testErrorOutput.trim() != "")
               print(result.testErrorOutput.trim()
+              .replaceAll("\r", "")
               .replaceAll(new RegExp(r"^"), "│ ")
               .replaceAll("\n", "\n│ "));
           } else {
