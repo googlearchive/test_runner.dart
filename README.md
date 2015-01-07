@@ -104,7 +104,8 @@ Browser tests are tests that need to be ran in a browser environment such as
 dartium.
 
 Browser tests will be executed in a headless version of Chromium for Dart called
-Content Shell.
+Content Shell. Content Shell is not the same thing as Dartium. If you don't have
+Content Shell installed read the [specific section](#content-shell) about it.
 
 If all tests have passed your test needs to print `PASS\n` ("PASS" followed by a
 line break).
@@ -130,6 +131,8 @@ appropriate test `Configuration` and will import
 DTR runs on Linux, Mac OS X and Windows. DTR also needs the following tools installed:
 
  - Content Shell: A headless version of Dartium. Needed to run browser tests.
+   Not the same thing as Dartium. Make sure you read the
+   [specific section](#content-shell) about it
  - Dart SDK: Especially the `pub` command which will be used to run and serve
    tests and `dart2js` which is used to detect browser tests.
 
@@ -137,6 +140,41 @@ Ideally make sure that these tools are available in your PATH as `pub`,
 `dart2js` and `content_shell` (with a `.bat` or `.exe` extension in Windows).
 You can also specify the path to these tools executables with
 `--content-shell-bin`, `--pub-bin` and `--dart2js-bin`.
+
+### Content Shell
+
+Content Shell is a stripped down version of Dartium/Chromium and it has the ability to
+run headlessly. This is not the same thing as Dartium and if you haven't already you
+likely need to install it.
+
+To install Content Shell download the [correct archive for your environment]
+(http://gsdview.appspot.com/dart-archive/channels/dev/release/latest/dartium/) and follow
+the instructions for your environment below:
+
+#### Linux
+
+Linux instructions comming soon.
+
+#### Windows
+
+Windows instructions comming soon.
+
+#### Mac OS X
+
+ - Unzip the archive and move the Content Shell.app file to your Application folder
+ - Create a `content_shell` bash script in your `/usr/local/bin` folder (or another
+   folder that's in your `PATH`) as:
+```
+#!/bin/bash
+"/Applications/Content Shell.app/Contents/MacOS/Content Shell" "$@"
+```
+Alternatively you can simply install Content Shell using Homebrew:
+
+    brew tap dart-lang/dart
+    brew install dartium
+    
+Installing Dartium via Homebrew will also install Content Shell and create the
+appropriate `content_shell` script.
 
 ## Options and examples
 
