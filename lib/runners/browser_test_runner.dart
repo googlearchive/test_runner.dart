@@ -219,7 +219,7 @@ class BrowserTestRunnerCodeGenerator extends TestRunnerCodeGenerator {
         if (!htmlFileString.contains("packages/unittest/test_controller.js")) {
           htmlFileString = htmlFileString.replaceFirst(
               "</body>", '<script type="text/javascript" '
-              'src="packages/unittest/test_controller.js"></script></body>');
+              'src="/packages/unittest/test_controller.js"></script></body>');
         }
       }
 

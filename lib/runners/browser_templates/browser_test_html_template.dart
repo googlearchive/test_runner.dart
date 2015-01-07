@@ -22,8 +22,8 @@ BSD-style license that can be found in the LICENSE file. -->
   </head>
   <body>
     <!-- Scripts -->
-    <script type="application/dart" src="./{{test_file_name}}"></script>
-    <script type="text/javascript" src="./packages/unittest/test_controller.js"></script>
+    <script type="application/dart" src="/{{test_file_name}}"></script>
+    <script type="text/javascript" src="/packages/unittest/test_controller.js"></script>
   </body>
 </html>
 ''';
