@@ -173,7 +173,7 @@ Alternatively you can simply install Content Shell using Homebrew:
 
     brew tap dart-lang/dart
     brew install dartium
-    
+
 Installing Dartium via Homebrew will also install Content Shell and create the
 appropriate `content_shell` script.
 
@@ -196,13 +196,15 @@ project will be discovered and ran.
 
 `--pub-bin`: Path to the Pub executable. If omitted "pub" from env is used.
 
-`--dart2js-bin`: Path to the dart2js executable. If omitted "dart2js" from env is
-used.
+`--dart2js-bin`: Path to the dart2js executable. If omitted "dart2js" from env
+                 is used.
 
 `--skip-browser-tests`: Skips all browser tests. Useful when browser binaries
-like content_shell are not available.
+                        like content_shell are not available.
 
-`--max-processes`: Maximum number of processes that will run in parallel. (defaults to "4")
+`--max-processes`: Maximum number of processes that will run in parallel.
+                   Defaults to "auto" which depends on the number of processors
+                   available.
 
 `-c` or `--color`: Prints the output in color in a shell.
 
