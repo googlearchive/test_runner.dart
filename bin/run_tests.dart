@@ -51,8 +51,10 @@ runTests(
     @Option(help: 'Path to the dart2js executable. If omitted "dart2js" from '
                   'env is used.')
     String dart2jsBin: "dart2js",
-    @Option(help: 'Maximum number of processes that will run in parallel.')
-    int maxProcesses: 4,
+    @Option(help: 'Maximum number of processes that will run in parallel.'
+                  '"auto" will use the number of processors available on the '
+                  'machine.')
+    String maxProcesses: "auto",
     @Flag(abbr: 'c', help: 'Prints the output in color in a shell.')
     bool color : false,
     @Flag(abbr: 'v', help: 'Prints all tests results instead of just the '
@@ -70,7 +72,21 @@ runTests(
     underlinePen = (String s) => "\x1B[4m$s\x1B[0m";
   }
 
-  // Find out if user has passed a list of test files or a Dart project.
+  // Find out how many max processes to run in parallel.
+
+  int maxParallelProcesses;
+  if (maxProcesses == "auto") {
+    maxParallelProcesses = Platform.numberOfProcessors;
+  } else {
+    maxParallelProcesses = int.parse(maxProcesses, onError: (String source) {
+      print(redPen("You specified '$source' as the maximum number of "
+          "concurrent processes. THis is invalid. You must specify a number "
+          "or 'auto' for the '--max-processes' option."));
+      return 4;
+    });
+  }
+
+  // Find out if user has passed a list of test files or a Dart project folder.
 
   String projectPath;
   List<String> tests = new List();
@@ -112,7 +128,7 @@ runTests(
   // Step 2: Check if a Dart project can be found in [projectPathUri].
 
   DartProject dartProject = new DartProject(projectPath, dartBinaries,
-                                            maxProcesses: maxProcesses);
+                                            maxProcesses: maxParallelProcesses);
   print("\nLooking for Dart project in \"$projectPath\"...");
   try {
     dartProject.checkProject();
@@ -188,7 +204,7 @@ runTests(
       print("\nRunning all tests...");
       TestRunnerDispatcher testRunners =
           new TestRunnerDispatcher(dartBinaries, dartProject,
-                                   maxProcesses: maxProcesses);
+                                   maxProcesses: maxParallelProcesses);
       testRunners.runTests(tests)
         ..listen((TestExecutionResult result) {
           // As soon as each test is finished we display the results.

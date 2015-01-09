@@ -1,5 +1,5 @@
 name: test_runner
-version: 0.2.9
+version: 0.2.10
 author: Nicolas Garnier <nivco@google.com>
 description: A Command Line Test Runner for Dart
 homepage: https://github.com/google/test_runner.dart

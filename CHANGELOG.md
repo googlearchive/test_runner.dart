@@ -3,6 +3,12 @@
 This file contains highlights of what changes on each version of the Dart Test
 Runner package.
 
+#### Version 0.2.10 ####
+
+- Option `--max-processes` is now a new option: 'auto' which is now the default
+  and will set the number of max processes depending on the number of processors
+  on the machine.
+
 #### Version 0.2.9 ####
 
 - Now limiting the number of tests and tests analysis processes that can run in
