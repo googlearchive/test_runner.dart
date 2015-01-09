@@ -3,6 +3,16 @@
 This file contains highlights of what changes on each version of the Dart Test
 Runner package.
 
+#### Version 0.2.9 ####
+
+- Now limiting the number of tests and tests analysis processes that can run in
+  parallel.
+- Added option `--max-processes` to allow setting the max number of processes
+  running concurrently.
+- Now showing the progress when detecting tests.
+- Changed the option name to specify the path to the `dart2js` executable from
+  `--dart2js` to `--dart2js-bin` for consistency.
+
 #### Version 0.2.8 ####
 
 - Added windows support.

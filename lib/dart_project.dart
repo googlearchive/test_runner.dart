@@ -11,6 +11,7 @@ import 'package:yaml/yaml.dart';
 import 'dart_binaries.dart';
 import 'test_configuration.dart';
 import 'test_runner.dart';
+import 'package:pool/pool.dart';
 
 /// Represents a Dart project
 class DartProject {
@@ -32,7 +33,14 @@ class DartProject {
   /// List of tests to run.
   Stream<TestConfiguration> tests;
 
-  DartProject(this.projectPath, this.dartBinaries);
+  /// Pool that limits the number of concurrently running tests.
+  Pool pool;
+
+  /// Constructor. You can specify the maximum number of tests detection
+  /// processes that can run in parallel with [maxProcesses].
+  DartProject(this.projectPath, this.dartBinaries, {int maxProcesses: 4}) {
+    pool = new Pool(maxProcesses);
+  }
 
   /// Check if a Dart project can be found in [projectPath] and loads its
   /// pubspec.yaml values into [pubSpecYaml].
@@ -83,9 +91,10 @@ class DartProject {
   /// either:
   ///  - Import 'package:unittest/unittest.dart' and have a main() function
   ///  - have a main function annotated with a [BrowserTest] or [VmTest]
-  void findTests(List<String> testPaths) {
+  Stream<TestConfiguration> findTests(List<String> testPaths) {
 
-    StreamController<TestConfiguration> controller = new StreamController();
+    StreamController<TestConfiguration> controller =
+        new StreamController.broadcast();
     tests = controller.stream;
 
     List<Future<TestConfiguration>> testConfFutureList = new List();
@@ -102,9 +111,11 @@ class DartProject {
           new Directory(testDirectory.absolute.resolveSymbolicLinksSync());
     } on StateError catch(e) {
       // No "test" folder so no tests to run.
-      return;
+      controller.close();
+      return tests;
     }
 
+    // Will list all files to be analyzed.
     List<FileSystemEntity> files = new List();
 
     // Special case if the user has manually specified a list of tests to run.
@@ -136,17 +147,19 @@ class DartProject {
     // Check if the files listed could be a Dart test and extract each test
     // configuration.
     for (FileSystemEntity file in files) {
-      Future<TestConfiguration> testConfFuture = extractTestConf(file)
-        ..then((TestConfiguration testConf) {
-        if (testConf != null) {
-          controller.add(testConf);
-        }
-      });
+      Future<TestConfiguration> testConfFuture = pool.withResource(() =>
+          extractTestConf(file)
+              ..then((TestConfiguration testConf) {
+                if (testConf != null) {
+                  controller.add(testConf);
+                }
+      }));
       testConfFutureList.add(testConfFuture);
     }
 
     // Notify the StreamController when all testConfig have been extracted.
     Future.wait(testConfFutureList).then((_) => controller.close());
+    return tests;
   }
 
   /// Extracts the given test [file]'s configuration. If the [file] is not a

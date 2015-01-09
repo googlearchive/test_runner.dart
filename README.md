@@ -157,11 +157,13 @@ project will be discovered and ran.
 
 `--pub-bin`: Path to the Pub executable. If omitted "pub" from env is used.
 
-`--dart2js`: Path to the dart2js executable. If omitted "dart2js" from env is
+`--dart2js-bin`: Path to the dart2js executable. If omitted "dart2js" from env is
 used.
 
 `--skip-browser-tests`: Skips all browser tests. Useful when browser binaries
 like content_shell are not available.
+
+`--max-processes`: Maximum number of processes that will run in parallel. (defaults to "4")
 
 `-c` or `--color`: Prints the output in color in a shell.
 

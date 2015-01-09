@@ -45,6 +45,10 @@ packages:
     description: path
     source: hosted
     version: "1.3.0"
+  pool:
+    description: pool
+    source: hosted
+    version: "1.0.1"
   quiver:
     description: quiver
     source: hosted

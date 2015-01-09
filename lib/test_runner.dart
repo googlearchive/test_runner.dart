@@ -13,6 +13,7 @@ import 'package:unittest/unittest.dart';
 import 'dart_binaries.dart';
 import 'test_configuration.dart';
 import 'dart_project.dart';
+import 'package:pool/pool.dart';
 
 part "runners/vm_test_runner.dart";
 part "runners/browser_test_runner.dart";
@@ -69,13 +70,19 @@ class TestRunnerDispatcher {
   /// The Dart project containing the tests.
   DartProject dartProject;
 
-  /// Constructor.
-  TestRunnerDispatcher(this.dartBinaries, this.dartProject);
+  /// Pool that limits the number of concurrently running tests.
+  Pool pool;
+
+  /// Constructor. You can specify the maximum number of tests that can run in
+  /// parallel with [maxProcesses].
+  TestRunnerDispatcher(this.dartBinaries, this.dartProject,
+                       {int maxProcesses: 4}) {
+    pool = new Pool(maxProcesses);
+  }
 
   /// Runs all the given [tests].
   ///
   /// TODO: Implement @NotParallelizable
-  /// TODO: Implement a pool of X (5?) number of tests ran at a time.
   Stream<TestExecutionResult> runTests(List<TestConfiguration> tests) {
 
     // We create a Stream so that we can display in real time results of tests
@@ -98,18 +105,19 @@ class TestRunnerDispatcher {
       }
 
       // Execute test and send result to the stream.
-      Future<TestExecutionResult> stuff = testRunner
-          .runTest(test)
-          // Kill the test after a set amount of time. Timeout.
-          .timeout(new Duration(seconds: TESTS_TIMEOUT_SEC), onTimeout: () {
-            TestExecutionResult result = new TestExecutionResult(test);
-            result.success = false;
-            result.testOutput = "The test did not complete in less than "
-                                "$TESTS_TIMEOUT_SEC seconds. It was aborted.";
-            return result;
-          })..then((TestExecutionResult result) {
-            controller.add(result);
-          });
+      Future<TestExecutionResult> stuff = pool.withResource(() =>
+          testRunner.runTest(test)
+              // Kill the test after a set amount of time. Timeout.
+              .timeout(new Duration(seconds: TESTS_TIMEOUT_SEC), onTimeout: () {
+                TestExecutionResult result = new TestExecutionResult(test);
+                result.success = false;
+                result.testOutput = "The test did not complete in less than "
+                                    "$TESTS_TIMEOUT_SEC seconds. "
+                                    "It was aborted.";
+                return result;
+              })..then((TestExecutionResult result) {
+                controller.add(result);
+          }));
 
       // Adding the test Future to the list of tests to watch.
       testRunnerResultFutures.add(stuff);

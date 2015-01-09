@@ -32,9 +32,9 @@ var underlinePen = (String s) => s;
 @ArgExample('tests/test1.dart tests/test2.dart',
     help: 'Runs the specified unit test files of the project in the current '
           'directory')
-@ArgExample('--project-path ~/my_project/',
-    help: 'Runs all unit tests of the project located at ~/my_project/')
-@ArgExample('--content-shell-bin ~/dartium/content_hell -p ~/my_project/',
+@ArgExample('~/my_project/',
+    help: 'Runs all tests of the project located at ~/my_project/')
+@ArgExample('--content-shell-bin ~/dartium/content_shell ~/my_project/',
     help: 'Runs all tests of the project located at ~/my_project/. Sets '
           '~/dartium/content_shell as the Content Shell executable.')
 runTests(
@@ -50,7 +50,9 @@ runTests(
     String pubBin: "pub",
     @Option(help: 'Path to the dart2js executable. If omitted "dart2js" from '
                   'env is used.')
-    String dart2js: "dart2js",
+    String dart2jsBin: "dart2js",
+    @Option(help: 'Maximum number of processes that will run in parallel.')
+    int maxProcesses: 4,
     @Flag(abbr: 'c', help: 'Prints the output in color in a shell.')
     bool color : false,
     @Flag(abbr: 'v', help: 'Prints all tests results instead of just the '
@@ -97,7 +99,7 @@ runTests(
   // Step 1: Check if the SDK binaries path have been set correctly.
 
   DartBinaries dartBinaries =
-      new DartBinaries(contentShellBin, pubBin, dart2js);
+      new DartBinaries(contentShellBin, pubBin, dart2jsBin);
   print("\nChecking Dart SDK binaries...");
   try {
     dartBinaries.checkDartSdkBinaries();
@@ -109,7 +111,8 @@ runTests(
 
   // Step 2: Check if a Dart project can be found in [projectPathUri].
 
-  DartProject dartProject = new DartProject(projectPath, dartBinaries);
+  DartProject dartProject = new DartProject(projectPath, dartBinaries,
+                                            maxProcesses: maxProcesses);
   print("\nLooking for Dart project in \"$projectPath\"...");
   try {
     dartProject.checkProject();
@@ -128,104 +131,139 @@ runTests(
     stderr.writeln(redPen("$e\n"));
     exit(2);
   }
-  dartProject.tests.toList().then((List<TestConfiguration> tests) {
 
-    // Error if no tests were found.
-    if (tests == null || tests.length == 0) {
-      stderr.writeln(redPen("No tests files were found.\n"));
-      exit(3);
-    }
+  List<TestConfiguration> partialListOfTests = new List();
 
-    List<TestConfiguration> browserTests = tests.where(
-        (TestConfiguration t) => t.testType is BrowserTest).toList();
-    print(greenPen("Found ${tests.length} test suites:"));
-    print(greenPen(" - ${tests.length - browserTests.length} Standalone VM"));
-    print(greenPen(" - ${browserTests.length} Dartium") +
-          (skipBrowserTests ? redPen(" (Will be skipped!)") : ""));
+  // Initialise the display of the test detection process
+  displayTestCount(partialListOfTests, false, skipBrowserTests);
 
+  dartProject.tests
+    // Display tests found progress.
+    ..listen((TestConfiguration conf) {
+      partialListOfTests.add(conf);
+      displayTestCount(partialListOfTests, true, skipBrowserTests);
+    })
 
-    // Step 3 bis: Check if browser binaries have been set correctly.
+    // Display final test count.
+    ..toList().then((List<TestConfiguration> tests) {
 
-    if (browserTests.length > 0 && !skipBrowserTests) {
-      print("\nChecking browser binaries...");
-      try {
-        dartBinaries.checkBrowserBinaries();
-      } catch (e) {
-        stderr.writeln(redPen("$e"));
-        stderr.writeln(redPen("You can choose to skip all browser tests by "
-            "using the --skip-browser-tests option and this binary won't be "
-            "needed.\n"));
-        exit(2);
+      // Error if no tests were found.
+      if (tests == null || tests.length == 0) {
+        print('\x1b[4A');
+        stderr.writeln(redPen("No tests files were found.\n"));
+        exit(3);
       }
-      print(greenPen("Browser binaries OK."));
-    } else if (skipBrowserTests) {
-      // If skipBrowserTests is true we remove all Browser tests.
-      tests = tests.where(
-          (TestConfiguration t) => !(t.testType is BrowserTest)).toList();
-    }
 
-    // Step 4: Run all tests and catch their output so that we can print it on
-    // the command line.
+      displayTestCount(tests, true, skipBrowserTests);
 
-    print("\nRunning all tests...");
-    TestRunnerDispatcher testRunners =
-        new TestRunnerDispatcher(dartBinaries, dartProject);
-    testRunners.runTests(tests)
+      // Step 3 bis: Check if browser binaries have been set correctly.
 
-      ..listen((TestExecutionResult result) {
-        // As soon as each test is finished we display the results.
-        if (verbose) print("");
-        if (result.success) {
-          print(greenPen("Test suite passed: ${result.test.testFileName}"));
-        } else {
-          print(redPen("Test suite failed: ${result.test.testFileName}"));
+      // Count browser tests.
+      List<TestConfiguration> browserTests = tests.where(
+              (TestConfiguration t) => t.testType is BrowserTest).toList();
+
+      // If there are browser tests and we need to run them. Check for browser
+      // binaries.
+      if (browserTests.length > 0 && !skipBrowserTests) {
+        print("\nChecking browser binaries...");
+        try {
+          dartBinaries.checkBrowserBinaries();
+        } catch (e) {
+          stderr.writeln(redPen("$e"));
+          stderr.writeln(redPen("You can choose to skip all browser tests by "
+              "using the --skip-browser-tests option and this binary won't be "
+              "needed.\n"));
+          exit(2);
         }
-        if (verbose || !result.success) {
-          print("Detailed results of test suite ${result.test.testFileName}:");
-          print("┌───────────────────────────────"
-              "${result.test.testFileName.replaceAll(new RegExp(r'.'), '─')}");
-          if (result.testOutput.trim() != ""
-              || result.testErrorOutput.trim() != "") {
-            print(result.testOutput.trim()
-            .replaceAll("\r", "")
-            .replaceAll(new RegExp(r"^"), "│ ")
-            .replaceAll("\n", "\n│ "));
-            if (result.testErrorOutput.trim() != "")
-              print(result.testErrorOutput.trim()
+        print(greenPen("Browser binaries OK."));
+      } else if (skipBrowserTests) {
+        // If skipBrowserTests is true we remove all Browser tests.
+        tests = tests.where(
+            (TestConfiguration t) => !(t.testType is BrowserTest)).toList();
+      }
+
+      // Step 4: Run all tests and catch their output so that we can print it on
+      // the command line.
+
+      print("\nRunning all tests...");
+      TestRunnerDispatcher testRunners =
+          new TestRunnerDispatcher(dartBinaries, dartProject,
+                                   maxProcesses: maxProcesses);
+      testRunners.runTests(tests)
+        ..listen((TestExecutionResult result) {
+          // As soon as each test is finished we display the results.
+          if (verbose) print("");
+          if (result.success) {
+            print(greenPen("Test suite passed: ${result.test.testFileName}"));
+          } else {
+            print(redPen("Test suite failed: ${result.test.testFileName}"));
+          }
+          if (verbose || !result.success) {
+            print("Detailed results of test suite "
+                "${result.test.testFileName}:");
+            print("┌───────────────────────────────"
+                "${result.test.testFileName.replaceAll(
+                    new RegExp(r'.'), '─')}");
+            if (result.testOutput.trim() != ""
+                || result.testErrorOutput.trim() != "") {
+              print(result.testOutput.trim()
               .replaceAll("\r", "")
               .replaceAll(new RegExp(r"^"), "│ ")
               .replaceAll("\n", "\n│ "));
-          } else {
-            print("│ There was no test output.");
+              if (result.testErrorOutput.trim() != "")
+                print(result.testErrorOutput.trim()
+                .replaceAll("\r", "")
+                .replaceAll(new RegExp(r"^"), "│ ")
+                .replaceAll("\n", "\n│ "));
+            } else {
+              print("│ There was no test output.");
+            }
           }
-        }
-      })
+        })
 
-      // Step 5: Display summary of tests results and cleanup generated files.
+        // Step 5: Display summary of tests results and cleanup generated files.
 
-      ..toList().then((List<TestExecutionResult> results) {
+        ..toList().then((List<TestExecutionResult> results) {
 
-        // Cleanup generated files.
-        TestRunnerCodeGenerator.deleteGeneratedTestFilesDirectory(dartProject);
+          // Cleanup generated files.
+          TestRunnerCodeGenerator
+              .deleteGeneratedTestFilesDirectory(dartProject);
 
-        // When all te tests are finished we display a summary and exit.
-        List<TestExecutionResult> failedTestResults =
-            results.where((TestExecutionResult t) => !t.success).toList();
-        if (failedTestResults.length == 0) {
-          print(greenPen("\nSummary: ALL ${results.length} TEST SUITE(S) "
-              "PASSED.\n"));
-          exit(0);
-        } else if (failedTestResults.length == results.length) {
-          print(redPen("\nSummary: ALL ${failedTestResults.length} "
-             "TEST SUITE(S) FAILED.\n"));
-          exit(1);
-        } else {
-          print("\nSummary: "
-              + redPen("${failedTestResults.length} TEST SUITE(S) FAILED. ")
-              + greenPen("${results.length - failedTestResults.length} TEST "
-                  "SUITE(S) PASSED.\n"));
-          exit(1);
-        }
-      });
+          // When all te tests are finished we display a summary and exit.
+          List<TestExecutionResult> failedTestResults =
+              results.where((TestExecutionResult t) => !t.success).toList();
+          if (failedTestResults.length == 0) {
+            print(greenPen("\nSummary: ALL ${results.length} TEST SUITE(S) "
+                "PASSED.\n"));
+            exit(0);
+          } else if (failedTestResults.length == results.length) {
+            print(redPen("\nSummary: ALL ${failedTestResults.length} "
+               "TEST SUITE(S) FAILED.\n"));
+            exit(1);
+          } else {
+            print("\nSummary: "
+                + redPen("${failedTestResults.length} TEST SUITE(S) FAILED. ")
+                + greenPen("${results.length - failedTestResults.length} TEST "
+                    "SUITE(S) PASSED.\n"));
+            exit(1);
+          }
+        });
   });
+}
+
+/// Displays the information about [tests] found.
+void displayTestCount(List<TestConfiguration> tests, bool erasePreviousLines,
+                      bool skipBrowserTests) {
+  if (erasePreviousLines) {
+    print('\x1b[4A');
+  }
+
+  // Find out how many tests are browser tests.
+  List<TestConfiguration> browserTests = tests.where(
+          (TestConfiguration t) => t.testType is BrowserTest).toList();
+
+  print(greenPen("Found ${tests.length} test suites:       "));
+  print(greenPen(" - ${tests.length - browserTests.length} Standalone VM"));
+  print(greenPen(" - ${browserTests.length} Dartium") +
+      (skipBrowserTests ? redPen(" (Will be skipped!)") : ""));
 }
