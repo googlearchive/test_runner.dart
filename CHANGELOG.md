@@ -3,6 +3,13 @@
 This file contains highlights of what changes on each version of the Dart Test
 Runner package.
 
+#### Version 0.2.11 ####
+
+Minor command line output formatting modifications:
+- Condensed the output of the test detection step to 1 line instead of 3.
+- Now printing the warning "Dartium tests will be skipped!" in Orange instead of
+  red when the --skip-browser-tests flag is used.
+
 #### Version 0.2.10 ####
 
 - Option `--max-processes` is now a new option: 'auto' which is now the default
