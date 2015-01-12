@@ -22,6 +22,9 @@ var redPen = (String s) => s;
 /// Green colored modifiers for writing to terminal in color mode.
 var greenPen = (String s) => s;
 
+/// Orange colored modifiers for writing to terminal in color mode.
+var orangePen = (String s) => s;
+
 /// Un-colored underlined modifiers for writing to terminal.
 var underlinePen = (String s) => s;
 
@@ -69,6 +72,7 @@ runTests(
   if (color) {
     redPen = new AnsiPen()..red(bold: true);
     greenPen = new AnsiPen()..green(bold: true);
+    orangePen = new AnsiPen()..rgb(r: 1,g: 0.45,b: 0);
     underlinePen = (String s) => "\x1B[4m$s\x1B[0m";
   }
 
@@ -151,13 +155,13 @@ runTests(
   List<TestConfiguration> partialListOfTests = new List();
 
   // Initialise the display of the test detection process
-  displayTestCount(partialListOfTests, false, skipBrowserTests);
+  displayTestCount(partialListOfTests, false, skipBrowserTests, true);
 
   dartProject.tests
     // Display tests found progress.
     ..listen((TestConfiguration conf) {
       partialListOfTests.add(conf);
-      displayTestCount(partialListOfTests, true, skipBrowserTests);
+      displayTestCount(partialListOfTests, true, skipBrowserTests, true);
     })
 
     // Display final test count.
@@ -165,12 +169,12 @@ runTests(
 
       // Error if no tests were found.
       if (tests == null || tests.length == 0) {
-        print('\x1b[4A');
-        stderr.writeln(redPen("No tests files were found.\n"));
+        print('\x1b[2A');
+        stderr.writeln(redPen("No tests files were found.                 \n"));
         exit(3);
       }
 
-      displayTestCount(tests, true, skipBrowserTests);
+      displayTestCount(tests, true, skipBrowserTests, false);
 
       // Step 3 bis: Check if browser binaries have been set correctly.
 
@@ -269,17 +273,23 @@ runTests(
 
 /// Displays the information about [tests] found.
 void displayTestCount(List<TestConfiguration> tests, bool erasePreviousLines,
-                      bool skipBrowserTests) {
+                      bool skipBrowserTests, bool partial) {
   if (erasePreviousLines) {
-    print('\x1b[4A');
+    print('\x1b[2A');
   }
 
   // Find out how many tests are browser tests.
   List<TestConfiguration> browserTests = tests.where(
           (TestConfiguration t) => t.testType is BrowserTest).toList();
 
-  print(greenPen("Found ${tests.length} test suites:       "));
-  print(greenPen(" - ${tests.length - browserTests.length} Standalone VM"));
-  print(greenPen(" - ${browserTests.length} Dartium") +
-      (skipBrowserTests ? redPen(" (Will be skipped!)") : ""));
+  print(greenPen("Found ${tests.length} test suites "
+        "(${tests.length - browserTests.length} "
+        "Standalone VM, ${browserTests.length} Dartium)."
+        + (partial ? ".." : "  ")));
+  if (browserTests.length > 0 && skipBrowserTests) {
+    print(orangePen("Dartium tests will be skipped!"));
+    if(partial) {
+      print('\x1b[2A');
+    }
+  }
 }
