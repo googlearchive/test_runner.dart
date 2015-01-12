@@ -76,7 +76,7 @@ packages:
   unscripted:
     description: unscripted
     source: hosted
-    version: "0.4.7"
+    version: "0.5.2+1"
   yaml:
     description: yaml
     source: hosted
