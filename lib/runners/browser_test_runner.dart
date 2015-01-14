@@ -54,9 +54,8 @@ class BrowserTestRunner extends TestRunner {
 
       Process
           .run(dartBinaries.contentShellBin,
-              ["--args", "--dump-render-tree", "--disable-gpu",
-               "--remote-debugging-port=$observatoryPort",
-               testUrl], runInShell: false)
+              ["--args", "--dump-render-tree",
+               "--disable-gpu", testUrl], runInShell: false)
           .then(
               (ProcessResult testProcessResult) {
                 if (testProcessResult.stdout.contains("#CRASHED")) {
