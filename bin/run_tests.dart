@@ -69,7 +69,7 @@ runTests(
 
   // Make output pretty and colored if requested.
 
-  if (color) {
+  if (color && !Platform.isWindows) {
     redPen = new AnsiPen()..red(bold: true);
     greenPen = new AnsiPen()..green(bold: true);
     orangePen = new AnsiPen()..rgb(r: 1,g: 0.45,b: 0);
@@ -144,10 +144,11 @@ runTests(
 
   // Step 3: Detect all unit tests and extract their configuration.
 
-  print("\nLooking for test suites...");
+  stdout.write("\nLooking for test suites...");
   try {
     dartProject.findTests(tests);
   } catch (e) {
+    stdout.write("\n");
     stderr.writeln(redPen("$e\n"));
     exit(2);
   }
@@ -274,22 +275,28 @@ runTests(
 /// Displays the information about [tests] found.
 void displayTestCount(List<TestConfiguration> tests, bool erasePreviousLines,
                       bool skipBrowserTests, bool partial) {
-  if (erasePreviousLines) {
-    print('\x1b[2A');
+  if (erasePreviousLines && !Platform.isWindows) {
+    print('\x1b[3A');
   }
 
-  // Find out how many tests are browser tests.
-  List<TestConfiguration> browserTests = tests.where(
-          (TestConfiguration t) => t.testType is BrowserTest).toList();
+  // In the case of Windows we just display a dot to show progress.
+  if (partial && Platform.isWindows) {
+    stdout.write(".");
+  } else {
+    stdout.write("\n");
+    // Find out how many tests are browser tests.
+    List<TestConfiguration> browserTests = tests.where(
+            (TestConfiguration t) => t.testType is BrowserTest).toList();
 
-  print(greenPen("Found ${tests.length} test suites "
-        "(${tests.length - browserTests.length} "
-        "Standalone VM, ${browserTests.length} Dartium)."
-        + (partial ? ".." : "  ")));
-  if (browserTests.length > 0 && skipBrowserTests) {
-    print(orangePen("Dartium tests will be skipped!"));
-    if(partial) {
-      print('\x1b[2A');
+    print(greenPen("Found ${tests.length} test suites "
+    "(${tests.length - browserTests.length} "
+    "Standalone VM, ${browserTests.length} Dartium)."
+    + (partial ? ".." : "  ")));
+    if (browserTests.length > 0 && skipBrowserTests) {
+      print(orangePen("Dartium tests will be skipped!"));
+      if (partial && !Platform.isMacOS) {
+        print('\x1b[3A');
+      }
     }
   }
 }
