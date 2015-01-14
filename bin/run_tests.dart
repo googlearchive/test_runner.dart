@@ -225,23 +225,26 @@ runTests(
           if (verbose || !result.success) {
             print("Detailed results of test suite "
                 "${result.test.testFileName}:");
-            print("┌───────────────────────────────"
-                "${result.test.testFileName.replaceAll(
-                    new RegExp(r'.'), '─')}");
+            print(makeWindowsCompatible("┌───────────────────────────────"
+                  "${result.test.testFileName.replaceAll(
+                      new RegExp(r'.'), '─')}"));
             if (result.testOutput.trim() != ""
                 || result.testErrorOutput.trim() != "") {
               print(result.testOutput.trim()
               .replaceAll("\r", "")
-              .replaceAll(new RegExp(r"^"), "│ ")
-              .replaceAll("\n", "\n│ "));
+              .replaceAll(new RegExp(r"^"), makeWindowsCompatible("│ "))
+              .replaceAll("\n", makeWindowsCompatible("\n│ ")));
               if (result.testErrorOutput.trim() != "")
                 print(result.testErrorOutput.trim()
                 .replaceAll("\r", "")
-                .replaceAll(new RegExp(r"^"), "│ ")
-                .replaceAll("\n", "\n│ "));
+                .replaceAll(new RegExp(r"^"), makeWindowsCompatible("│ "))
+                .replaceAll("\n", makeWindowsCompatible("\n│ ")));
             } else {
-              print("│ There was no test output.");
+              print(makeWindowsCompatible("│ There was no test output."));
             }
+            print(makeWindowsCompatible("└───────────────────────────────"
+            "${result.test.testFileName.replaceAll(
+                new RegExp(r'.'), '─')}"));
           }
         })
 
@@ -301,5 +304,16 @@ void displayTestCount(List<TestConfiguration> tests, bool erasePreviousLines,
         print('\x1b[3A');
       }
     }
+  }
+}
+
+String makeWindowsCompatible(String s) {
+  if(Platform.isWindows) {
+    return s.replaceAll("┌", ".")
+            .replaceAll("─", "-")
+            .replaceAll("│", "|")
+            .replaceAll("└", ".");
+  } else {
+    return s;
   }
 }
