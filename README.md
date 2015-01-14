@@ -170,7 +170,7 @@ Linux instructions coming soon.
 
     #!/bin/bash
     "/Applications/Content Shell.app/Contents/MacOS/Content Shell" "$@"
-    
+
 Alternatively you can simply install Content Shell using Homebrew:
 
     brew tap dart-lang/dart
@@ -241,7 +241,7 @@ Shell in Linux). So as an alternative we are  providing a Docker image that can
 be used to run your tests. There are also options to automatically run tests of
 your Packages on Pub or your GitHub repos.
 
-For more details read [docker/README](docker/README).
+For more details read [docker/README](docker/README.md).
 
 ## License
 
