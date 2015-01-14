@@ -98,7 +98,7 @@ apt-get install libc6-dev
 
 ## Mac OS X
 
- - Unzip the archive and move the Content Shell.app file to your Application
+ - Unzip the archive and move the Content Shell.app file to your `Applications`
    folder
  - Create a `content_shell` bash script in your `/usr/local/bin` folder (or
    another folder that's in your `PATH`) with the following content:
