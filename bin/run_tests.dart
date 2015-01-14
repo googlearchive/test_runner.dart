@@ -170,8 +170,11 @@ runTests(
 
       // Error if no tests were found.
       if (tests == null || tests.length == 0) {
-        print('\x1b[2A');
-        stderr.writeln(redPen("No tests files were found.                 \n"));
+        if (!Platform.isWindows) {
+          print('\x1b[2A');
+        }
+        stderr.writeln(redPen("No tests files were found."
+            "                                   \n"));
         exit(3);
       }
 
@@ -283,7 +286,7 @@ void displayTestCount(List<TestConfiguration> tests, bool erasePreviousLines,
   if (partial && Platform.isWindows) {
     stdout.write(".");
   } else {
-    stdout.write("\n");
+    stdout.write("\n\r");
     // Find out how many tests are browser tests.
     List<TestConfiguration> browserTests = tests.where(
             (TestConfiguration t) => t.testType is BrowserTest).toList();
