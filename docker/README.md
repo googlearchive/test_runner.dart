@@ -5,9 +5,9 @@ makes it easy to run a [Dart](https://dartlang.org) applications tests.
 
 It can automatically download a Dart application and its dependencies and run
 all tests of the project in an environment pre-configured with all tools to run
-tests (Dartium ContentShell, Dart SDK, Dart Test Runner...).
+tests (Dartium Content Shell, Dart SDK, Dart Test Runner...).
 
-It is based on the [`ubuntu`][1] base image.
+It is based on the [`google/dart`][1] image.
 
 ## Usage
 
@@ -62,5 +62,5 @@ colored output by adding `-c`:
 
     docker run -e REPO=google/test_runner.dart google/dart-test-runner -c
 
-[1]: https://registry.hub.docker.com/_/ubuntu/
+[1]: https://registry.hub.docker.com/u/google/dart/
 [2]: https://registry.hub.docker.com/u/google/dart-test-runner/
