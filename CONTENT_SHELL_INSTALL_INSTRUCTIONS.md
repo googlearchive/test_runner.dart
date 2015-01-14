@@ -6,7 +6,7 @@ haven't already you likely need to install it.
 
 To install Content Shell download the [correct archive for your environment]
 (http://gsdview.appspot.com/dart-archive/channels/dev/release/latest/dartium/)
-and follow the instructions below for your environment. Currently We have instructiuons for [Linux](#linux), [Windows](#windows) and [Mac OS X](#mac-os-x).
+and follow the instructions below for your environment. Currently We have instructiuons for [Linux](#linux) (Ubuntu Trusty, Ubuntu Precise and Debian Wheezy), [Windows](#windows) and [Mac OS X](#mac-os-x).
 
 ## Linux
 
