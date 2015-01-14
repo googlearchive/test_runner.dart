@@ -167,10 +167,10 @@ Linux instructions coming soon.
    folder
  - Create a `content_shell` bash script in your `/usr/local/bin` folder (or
    another folder that's in your `PATH`) with the following content:
-
-    #!/bin/bash
-    "/Applications/Content Shell.app/Contents/MacOS/Content Shell" "$@"
-    
+```
+#!/bin/bash
+"/Applications/Content Shell.app/Contents/MacOS/Content Shell" "$@"
+```    
 Alternatively you can simply install Content Shell using Homebrew:
 
     brew tap dart-lang/dart
@@ -237,9 +237,9 @@ Runs all tests of the project located at `~/my_project/` and use
 ## Test using Docker
 
 The test environment can sometimes be tricky to setup (for instance Content
-Shell in Linux). So as an alternative we are  providing a Docker image that can
+Shell in Linux). As an alternative we are providing a Docker image that can
 be used to run your tests. There are also options to automatically run tests of
-your Packages on Pub or your GitHub repos.
+Pub packages or GitHub repos.
 
 For more details read [docker/README](docker/README).
 
