@@ -24,7 +24,7 @@ echo "deb http://gce_debian_mirror.storage.googleapis.com wheezy-updates contrib
 apt-get update
 ```
 
- - Install these dependencies:
+ - Install dependencies:
  
 ```
 apt-get install chromium-browser ttf-kochi-gothic ttf-kochi-mincho ttf-mscorefonts-installer \
@@ -47,7 +47,7 @@ echo "deb http://gce_debian_mirror.storage.googleapis.com precise-updates contri
 apt-get update
 ```
 
- - Install these dependencies:
+ - Install dependencies:
  
 ```
 apt-get install chromium-browser libudev0 ttf-kochi-gothic ttf-kochi-mincho \
@@ -64,7 +64,7 @@ echo "deb http://archive.ubuntu.com/ubuntu/ trusty-updates multiverse" >> /etc/a
 apt-get update
 ```
 
- - Install these dependencies:
+ - Install dependencies:
  
 ```
 apt-get install chromium-browser ttf-kochi-gothic ttf-kochi-mincho ttf-mscorefonts-installer \
