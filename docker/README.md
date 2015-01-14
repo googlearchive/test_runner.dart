@@ -5,9 +5,9 @@ makes it easy to run a [Dart](https://dartlang.org) applications tests.
 
 It can automatically download a Dart application and its dependencies and run
 all tests of the project in an environment pre-configured with all tools to run
-tests (Dartium ContentShell, Dart SDK, Dart Test Runner...).
+tests (Dartium Content Shell, Dart SDK, Dart Test Runner...).
 
-It is based on the [`ubuntu`][1] base image.
+It is based on the [`google/dart`][1] image.
 
 ## Usage
 
@@ -22,7 +22,7 @@ To automatically download and test a Pub package run:
 
 example: `docker run -e PKG=test_runner -e VERSION=0.2.11 google/dart-test-runner`
 
-example: `docker run -e PKG=test_runner -e VERSION=0.2.11 google/dart-test-runner:1.9.0_dev`
+example: `docker run -e PKG=test_runner -e VERSION=0.2.11 google/dart-test-runner:1.8.3`
 
 ### GitHub repos
 
@@ -36,7 +36,7 @@ example: `docker run -e REPO=google/test_runner.dart -e BRANCH=1d10a11f0404be12e
 
 example: `docker run -e REPO=google/test_runner.dart google/dart-test-runner # Defaults to master`
 
-example: `docker run -e REPO=google/test_runner.dart google/dart-test-runner:1.9.0_dev`
+example: `docker run -e REPO=google/test_runner.dart google/dart-test-runner:1.8.3`
 
 ### Local projects
 
@@ -62,5 +62,5 @@ colored output by adding `-c`:
 
     docker run -e REPO=google/test_runner.dart google/dart-test-runner -c
 
-[1]: https://registry.hub.docker.com/_/ubuntu/
+[1]: https://registry.hub.docker.com/u/google/dart/
 [2]: https://registry.hub.docker.com/u/google/dart-test-runner/
