@@ -4,7 +4,7 @@
 #
 # Dockerfile for google/dart-test-runner
 
-FROM google/dart:1.8.3
+FROM google/dart
 
 # Enable contrib and non-free packages.
 
