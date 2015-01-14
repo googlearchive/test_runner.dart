@@ -173,7 +173,8 @@ class DartProject {
     if (!FileSystemEntity.isFileSync(file.path)
         || !file.path.endsWith(TEST_FILE_SUFFIX)
         || file.path.contains(
-            TestRunnerCodeGenerator.GENERATED_TEST_FILES_DIR_NAME + "/")) {
+            TestRunnerCodeGenerator.GENERATED_TEST_FILES_DIR_NAME
+                + Platform.pathSeparator)) {
       completer.complete(null);
       return completer.future;
     }
