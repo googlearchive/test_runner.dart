@@ -113,5 +113,5 @@ Alternatively you can simply install Content Shell using Homebrew:
     brew tap dart-lang/dart
     brew install dartium
 
-Installing Dartium via Homebrew will also install Content Shell and create the
+Installing Dartium via Homebrew also installs Content Shell and create the
 appropriate `content_shell` script.
