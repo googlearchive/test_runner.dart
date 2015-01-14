@@ -22,7 +22,7 @@ To automatically download and test a Pub package run:
 
 example: `docker run -e PKG=test_runner -e VERSION=0.2.11 google/dart-test-runner`
 
-example: `docker run -e PKG=test_runner -e VERSION=0.2.11 google/dart-test-runner:1.9.0_dev`
+example: `docker run -e PKG=test_runner -e VERSION=0.2.11 google/dart-test-runner:1.8.3`
 
 ### GitHub repos
 
@@ -36,7 +36,7 @@ example: `docker run -e REPO=google/test_runner.dart -e BRANCH=1d10a11f0404be12e
 
 example: `docker run -e REPO=google/test_runner.dart google/dart-test-runner # Defaults to master`
 
-example: `docker run -e REPO=google/test_runner.dart google/dart-test-runner:1.9.0_dev`
+example: `docker run -e REPO=google/test_runner.dart google/dart-test-runner:1.8.3`
 
 ### Local projects
 
