@@ -154,7 +154,18 @@ and follow the instructions for your environment:
 
 #### Linux
 
-Linux instructions coming soon.
+For Ubuntu Trusty:
+
+ - Enable multiverse packages: `echo "deb http://gce_debian_mirror.storage.googleapis.com wheezy contrib non-free" >> /etc/apt/sources.list && echo "deb http://gce_debian_mirror.storage.googleapis.com wheezy-updates contrib non-free" >> /etc/apt/sources.list && apt-get update`
+ - Install these dependencies: `apt-get install chromium browser ttf-kochi-gothic ttf-kochi-mincho ttf-mscorefonts-installer ttf-indic-fonts ttf-dejavu-core ttf-indic-fonts-core fonts-thai-tlwg`
+ - Trick to get libudev0: `ln -sf /lib/x86_64-linux-gnu/libudev.so.1 /lib/x86_64-linux-gnu/libudev.so.0`
+
+For Debian Wheezy:
+
+ - Enable contrib and non-free packages: `echo "deb http://archive.ubuntu.com/ubuntu/ trusty multiverse" >> /etc/apt/sources.list && echo "deb http://archive.ubuntu.com/ubuntu/ trusty-updates multiverse" >> /etc/apt/sources.list && apt-get update`
+ - Install these dependencies: `apt-get install chromium browser ttf-kochi-gothic ttf-kochi-mincho ttf-mscorefonts-installer ttf-indic-fonts ttf-dejavu-core fonts-thai-tlwg`
+ - Trick to fake ttf-indic-fonts-core since ttf-indic-fonts is transitional: `cd /usr/share/fonts/truetype && sudo mkdir ttf-indic-fonts-core && cd ttf-indic-fonts-core && sudo ln -s ../lohit-punjabi/Lohit-Punjabi.ttf lohit_hi.ttf && sudo ln -s ../lohit-tamil/Lohit-Tamil.ttf lohit_ta.ttf && sudo ln -s ../fonts-beng-extra/MuktiNarrow.ttf && sudo ln -s ../lohit-punjabi/Lohit-Punjabi.ttf lohit_pa.ttf`
+ - Install libc6-dev from testing source: `echo "deb http://ftp.debian.org/debian/ testing main contrib non-free" >> /etc/apt/sources.list && apt-get update && apt-get install libc6-dev`
 
 #### Windows
 

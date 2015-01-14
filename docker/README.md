@@ -21,6 +21,7 @@ To automatically download and test a Pub package run:
     docker run -e PKG=<package_name> -e VERSION=<package_version> google/dart-test-runner
 
 example: `docker run -e PKG=test_runner -e VERSION=0.2.11 google/dart-test-runner`
+
 example: `docker run -e PKG=test_runner -e VERSION=0.2.11 google/dart-test-runner:1.9.0_dev`
 
 ### GitHub repos
@@ -30,8 +31,11 @@ To automatically download and test a GitHub repo run:
     docker run -e REPO=<repo_path> -e BRANCH=<branch_name> google/dart-test-runner
 
 example: `docker run -e REPO=google/test_runner.dart -e BRANCH=master google/dart-test-runner`
+
 example: `docker run -e REPO=google/test_runner.dart -e BRANCH=1d10a11f0404be12ec643396c5b3db9041bb9919 google/dart-test-runner`
+
 example: `docker run -e REPO=google/test_runner.dart google/dart-test-runner # Defaults to master`
+
 example: `docker run -e REPO=google/test_runner.dart google/dart-test-runner:1.9.0_dev`
 
 ### Local projects
@@ -50,6 +54,8 @@ To run the tests use:
 
     docker build -t my_project/tests .
     docker run my_project/tests
+
+### Options
 
 You can also pass options to the Dart Test Runner. For instance you can get a
 colored output by adding `-c`:
