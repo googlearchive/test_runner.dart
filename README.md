@@ -128,7 +128,8 @@ appropriate test `Configuration` and will import
 
 ## Tools and environment
 
-DTR runs on Linux, Mac OS X and Windows. DTR also needs the following tools installed:
+DTR runs on Linux, Mac OS X and Windows. DTR also needs the following tools
+installed:
 
  - Content Shell: A headless version of Dartium. Needed to run browser tests.
    Not the same thing as Dartium. Make sure you read the
@@ -143,32 +144,33 @@ You can also specify the path to these tools executables with
 
 ### Content Shell
 
-Content Shell is a stripped down version of Dartium/Chromium and it has the ability to
-run headlessly. This is not the same thing as Dartium and if you haven't already you
-likely need to install it.
+Content Shell is a stripped down version of Dartium/Chromium and it has the
+ability to run headlessly. This is not the same thing as Dartium and if you
+haven't already you likely need to install it.
 
 To install Content Shell download the [correct archive for your environment]
-(http://gsdview.appspot.com/dart-archive/channels/dev/release/latest/dartium/) and follow
-the instructions for your environment:
+(http://gsdview.appspot.com/dart-archive/channels/dev/release/latest/dartium/)
+and follow the instructions for your environment:
 
 #### Linux
 
-Linux instructions comming soon.
+Linux instructions coming soon.
 
 #### Windows
 
  - Unzip the archive into a folder
- - Add the folder to your ```PATH```
+ - Add the folder to your `PATH`
 
 #### Mac OS X
 
- - Unzip the archive and move the Content Shell.app file to your Application folder
- - Create a `content_shell` bash script in your `/usr/local/bin` folder (or another
-   folder that's in your `PATH`) with the following content:
-```
-#!/bin/bash
-"/Applications/Content Shell.app/Contents/MacOS/Content Shell" "$@"
-```
+ - Unzip the archive and move the Content Shell.app file to your Application
+   folder
+ - Create a `content_shell` bash script in your `/usr/local/bin` folder (or
+   another folder that's in your `PATH`) with the following content:
+
+    #!/bin/bash
+    "/Applications/Content Shell.app/Contents/MacOS/Content Shell" "$@"
+    
 Alternatively you can simply install Content Shell using Homebrew:
 
     brew tap dart-lang/dart
