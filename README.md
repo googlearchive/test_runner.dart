@@ -59,6 +59,7 @@ Here is an example of output from the Dart test runner:
     │     Actual: <0>
     │   ...
     │ 0 PASSED, 2 FAILED, 0 ERRORS
+    └────────────────────────────────────────────────
     Test suite passed: /browser_ok_test.dart
     Test suite passed: /browser_ok_with_html_test.dart
 
