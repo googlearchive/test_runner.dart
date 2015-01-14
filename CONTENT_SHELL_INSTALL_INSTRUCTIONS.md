@@ -14,7 +14,7 @@ and follow the instructions for your environment:
  - Add the folder to your `PATH`
  - Install the dependencies depending on your Linux distribution below.
 
-Ubuntu Trusty:
+### Ubuntu Trusty:
 
  - Enable multiverse packages:
  
@@ -30,7 +30,7 @@ Ubuntu Trusty:
  - Trick to get libudev0:
    `ln -sf /lib/x86_64-linux-gnu/libudev.so.1 /lib/x86_64-linux-gnu/libudev.so.0`
 
-For Ubuntu Precise:
+### Ubuntu Precise:
 
  - Enable multiverse packages:
  
@@ -44,7 +44,7 @@ For Ubuntu Precise:
  
    `apt-get install chromium-browser libudev0 ttf-kochi-gothic ttf-kochi-mincho ttf-mscorefonts-installer ttf-indic-fonts ttf-dejavu-core ttf-indic-fonts-core fonts-thai-tlwg`
 
-For Debian Wheezy:
+### Debian Wheezy:
 
  - Enable contrib and non-free packages:
  
