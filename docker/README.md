@@ -55,6 +55,8 @@ To run the tests use:
     docker build -t my_project/tests .
     docker run my_project/tests
 
+### Options
+
 You can also pass options to the Dart Test Runner. For instance you can get a
 colored output by adding `-c`:
 
