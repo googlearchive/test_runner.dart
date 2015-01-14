@@ -232,6 +232,15 @@ Runs all tests of the project located at `~/my_project/` and use
 
     run_tests --content-shell-bin ~/dartium/content_shell ~/my_project/
 
+## Test using Docker
+
+The test environment can sometimes be tricky to setup (for instance Content
+Shell in Linux). So as an alternative we are  providing a Docker image that can
+be used to run your tests. There are also options to automatically run tests of
+your Packages on Pub or your GitHub repos.
+
+For more details read [docker/README](docker/README).
+
 ## License
 
 BSD 3-Clause License.
