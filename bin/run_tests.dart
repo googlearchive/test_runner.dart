@@ -289,7 +289,7 @@ void displayTestCount(List<TestConfiguration> tests, bool erasePreviousLines,
   if (partial && Platform.isWindows) {
     stdout.write(".");
   } else {
-    stdout.write("\n\r");
+    stdout.write("\r\n");
     // Find out how many tests are browser tests.
     List<TestConfiguration> browserTests = tests.where(
             (TestConfiguration t) => t.testType is BrowserTest).toList();
@@ -300,7 +300,7 @@ void displayTestCount(List<TestConfiguration> tests, bool erasePreviousLines,
     + (partial ? ".." : "  ")));
     if (browserTests.length > 0 && skipBrowserTests) {
       print(orangePen("Dartium tests will be skipped!"));
-      if (partial && !Platform.isMacOS) {
+      if (partial && !Platform.isWindows) {
         print('\x1b[3A');
       }
     }
