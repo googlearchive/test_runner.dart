@@ -8,4 +8,4 @@ import 'run_tests.dart' as original;
 
 /// This is an alias to run_tests.dart to make it easy to run the tool with `pub
 /// global`.
-main(arguments) => original.main(arguments);
+void main(List<String> arguments) => original.main(arguments);

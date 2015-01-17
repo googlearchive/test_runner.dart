@@ -14,7 +14,7 @@ import 'package:test_runner/test_configuration.dart';
 import 'package:test_runner/test_runner.dart';
 
 /// Entry point which simply calls [runTests] with the command line arguments.
-main(arguments) => declare(runTests).execute(arguments);
+void main(List<String> arguments) => declare(runTests).execute(arguments);
 
 /// Red colored modifiers for writing to terminal in color mode.
 var redPen = (String s) => s;
