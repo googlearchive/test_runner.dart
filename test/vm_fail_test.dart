@@ -39,8 +39,8 @@ List quickSort(List array) {
 }
 
 void main() {
-  test('QuickSort', () =>
-      expect(quickSort([5, 4, 3, 2, 1]), orderedEquals([1, 2, 3, 4, 5])));
+  test('QuickSort',
+      () => expect(quickSort([5, 4, 3, 2, 1]), orderedEquals([1, 2, 3, 4, 5])));
   test('Partition', () {
     List array = [3, 2, 1];
     int index = _partition(array, 0, array.length - 1, 1);

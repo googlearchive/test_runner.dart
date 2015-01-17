@@ -44,8 +44,7 @@ class BrowserTest extends Test {
   static const Symbol DARTIUM_BROWSER = #dartium;
 
   const BrowserTest({this.disableTransformers: false,
-                    this.browser: DARTIUM_BROWSER,
-                    this.htmlFilePath: null});
+      this.browser: DARTIUM_BROWSER, this.htmlFilePath: null});
 }
 
 /// Indicates that the test is to be ran in a Server side/Command line
@@ -101,9 +100,8 @@ class TestConfiguration {
   final bool shouldFail;
 
   TestConfiguration(this.testFilePath, this.dartProject,
-                    {this.testType: const VmTest(), this.parallelizable: true,
-                    this.shouldFail: false}) {
-  }
+      {this.testType: const VmTest(), this.parallelizable: true,
+      this.shouldFail: false}) {}
 
   /// Path of the test file relative to the test directory.
   String get testFileName {

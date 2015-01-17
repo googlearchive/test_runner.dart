@@ -33,14 +33,13 @@ class BrowserTestRunner extends TestRunner {
 
   @override
   Future<TestExecutionResult> runTest(TestConfiguration test) {
-
     Completer<TestExecutionResult> completer = new Completer();
 
     // Create the temporary generated test files.
     BrowserTestRunnerCodeGenerator codeGenerator =
         new BrowserTestRunnerCodeGenerator(dartProject);
-    Future htmlFileFuture = codeGenerator.createTestHtmlFile(test.testFileName,
-        (test.testType as BrowserTest).htmlFilePath);
+    Future htmlFileFuture = codeGenerator.createTestHtmlFile(
+        test.testFileName, (test.testType as BrowserTest).htmlFilePath);
     Future dartFileFuture = codeGenerator.createTestDartFile(test.testFileName);
 
     // Start the Web Server and run the test.
@@ -134,7 +133,6 @@ class BrowserTestRunner extends TestRunner {
   // TODO: move code coverage logic to a separate class and build an interface
   //       to retrieve code coverage from the TestRunnerDispatcher.
   void startCodeCoverageListener() {
-
     var port = observatoryPort;
 
     onTimeout() {
@@ -163,16 +161,14 @@ class BrowserTestRunner extends TestRunner {
   /// an [Observatory].
   // This is experimental.
   static Future<Map> getAllCoverage(Observatory observatory) {
-    return observatory.getIsolates()
-    .then((isolates) => isolates.map((i) => i.getCoverage()))
-    .then(Future.wait)
-    .then((responses) {
+    return observatory
+        .getIsolates()
+        .then((isolates) => isolates.map((i) => i.getCoverage()))
+        .then(Future.wait)
+        .then((responses) {
       // flatten response lists
       var allCoverage = responses.expand((it) => it).toList();
-      return {
-          'type': 'CodeCoverage',
-          'coverage': allCoverage,
-      };
+      return {'type': 'CodeCoverage', 'coverage': allCoverage,};
     });
   }
 }
@@ -196,8 +192,7 @@ class BrowserTestRunnerCodeGenerator extends TestRunnerCodeGenerator {
       // If the test does not have an associated test file we'll call the test
       // file inside of a default HTML file.
       htmlFileReader = (new Completer<String>()
-          ..complete(BROWSER_TEST_HTML_FILE_TEMPLATE)).future;
-
+        ..complete(BROWSER_TEST_HTML_FILE_TEMPLATE)).future;
     } else {
       // Custom HTML test files.
       htmlFileReader = new File(testHtmlFilePath).readAsString();
