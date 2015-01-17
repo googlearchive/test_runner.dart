@@ -6,6 +6,7 @@ library test_runner.dart_binaries;
 
 import 'dart:async';
 import 'dart:io';
+
 import 'package:path/path.dart' as path;
 
 /// Holds pointers to Dart SDK binaries and offers convenience methods.
@@ -24,7 +25,7 @@ class DartBinaries {
 
   /// Checks that all the Dart SDK binaries are accessible and working.
   /// If some binaries are not in the PATH a [ArgumentError] will be thrown.
-  checkDartSdkBinaries() {
+  void checkDartSdkBinaries() {
     pubBin = _checkBinary(pubBin, "--pub-bin", "pub", "Pub");
     dart2jsBin = _checkBinary(dart2jsBin, "--dart2js-bin",
         "dart2js", "dart2js");
@@ -33,7 +34,7 @@ class DartBinaries {
   /// Checks that all the binaries needed for browser testing are accessible and
   /// working.
   /// If some binaries are not in the PATH a [ArgumentError] will be thrown.
-  checkBrowserBinaries() {
+  void checkBrowserBinaries() {
     contentShellBin = _checkBinary(contentShellBin, "--content-shell-bin",
         "content_shell", "Content Shell");
   }

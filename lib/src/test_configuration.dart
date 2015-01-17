@@ -5,7 +5,9 @@
 library test_runner.test_configuration;
 
 import 'dart:io';
+
 import 'package:path/path.dart' as path;
+
 import 'dart_project.dart';
 
 // The classes below used as annotations to configure test files.

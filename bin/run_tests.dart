@@ -8,9 +8,6 @@ import 'dart:io';
 import 'package:ansicolor/ansicolor.dart';
 import 'package:unscripted/unscripted.dart';
 
-import 'package:test_runner/dart_project.dart';
-import 'package:test_runner/dart_binaries.dart';
-import 'package:test_runner/test_configuration.dart';
 import 'package:test_runner/test_runner.dart';
 
 /// Entry point which simply calls [runTests] with the command line arguments.

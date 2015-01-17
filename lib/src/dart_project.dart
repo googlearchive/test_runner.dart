@@ -6,12 +6,14 @@ library test_runner.dart_project;
 
 import 'dart:async';
 import 'dart:io';
+
 import 'package:path/path.dart' as path;
+import 'package:pool/pool.dart';
 import 'package:yaml/yaml.dart';
+
 import 'dart_binaries.dart';
 import 'test_configuration.dart';
-import 'test_runner.dart';
-import 'package:pool/pool.dart';
+import 'util.dart';
 
 /// Represents a Dart project
 class DartProject {
@@ -173,7 +175,7 @@ class DartProject {
     if (!FileSystemEntity.isFileSync(file.path)
         || !file.path.endsWith(TEST_FILE_SUFFIX)
         || file.path.contains(
-            TestRunnerCodeGenerator.GENERATED_TEST_FILES_DIR_NAME
+            GENERATED_TEST_FILES_DIR_NAME
                 + Platform.pathSeparator)) {
       completer.complete(null);
       return completer.future;
