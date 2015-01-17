@@ -16,17 +16,19 @@ import 'package:test_runner/test_runner.dart';
 /// Entry point which simply calls [runTests] with the command line arguments.
 void main(List<String> arguments) => declare(runTests).execute(arguments);
 
+typedef String _Pen(String input);
+
 /// Red colored modifiers for writing to terminal in color mode.
-var redPen = (String s) => s;
+_Pen _redPen = (String s) => s;
 
 /// Green colored modifiers for writing to terminal in color mode.
-var greenPen = (String s) => s;
+_Pen _greenPen = (String s) => s;
 
 /// Orange colored modifiers for writing to terminal in color mode.
-var orangePen = (String s) => s;
+_Pen _orangePen = (String s) => s;
 
 /// Un-colored underlined modifiers for writing to terminal.
-var underlinePen = (String s) => s;
+_Pen _underlinePen = (String s) => s;
 
 // All metadata annotations are optional.
 @Command(help: 'Runs Dart unit tests')
@@ -40,7 +42,7 @@ var underlinePen = (String s) => s;
 @ArgExample('--content-shell-bin ~/dartium/content_shell ~/my_project/',
     help: 'Runs all tests of the project located at ~/my_project/. Sets '
           '~/dartium/content_shell as the Content Shell executable.')
-runTests(
+void runTests(
     @Rest(help: 'Path to the project root/test folder or list of path to '
                 'individual test files to run. If omitted all tests of the '
                 'current project will be discovered and ran.')
@@ -70,10 +72,10 @@ runTests(
   // Make output pretty and colored if requested.
 
   if (color && !Platform.isWindows) {
-    redPen = new AnsiPen()..red(bold: true);
-    greenPen = new AnsiPen()..green(bold: true);
-    orangePen = new AnsiPen()..rgb(r: 1,g: 0.45,b: 0);
-    underlinePen = (String s) => "\x1B[4m$s\x1B[0m";
+    _redPen = new AnsiPen()..red(bold: true);
+    _greenPen = new AnsiPen()..green(bold: true);
+    _orangePen = new AnsiPen()..rgb(r: 1,g: 0.45,b: 0);
+    _underlinePen = (String s) => "\x1B[4m$s\x1B[0m";
   }
 
   // Find out how many max processes to run in parallel.
@@ -83,7 +85,7 @@ runTests(
     maxParallelProcesses = Platform.numberOfProcessors;
   } else {
     maxParallelProcesses = int.parse(maxProcesses, onError: (String source) {
-      print(redPen("You specified '$source' as the maximum number of "
+      print(_redPen("You specified '$source' as the maximum number of "
           "concurrent processes. THis is invalid. You must specify a number "
           "or 'auto' for the '--max-processes' option."));
       return 4;
@@ -104,7 +106,7 @@ runTests(
             (String path) => path.endsWith(".dart"));
 
     if (oneDartFiles && !allDartFiles) {
-      stderr.writeln(redPen("\nYou can only specify one Dart project directory "
+      stderr.writeln(_redPen("\nYou can only specify one Dart project directory "
           "or a list of test files.\n"));
       exit(2);
     } else if (!allDartFiles && projectOrTests.length == 1) {
@@ -124,10 +126,10 @@ runTests(
   try {
     dartBinaries.checkDartSdkBinaries();
   } catch (e) {
-    stderr.writeln(redPen("$e\n"));
+    stderr.writeln(_redPen("$e\n"));
     exit(2);
   }
-  print(greenPen("Dart SDK binaries OK."));
+  print(_greenPen("Dart SDK binaries OK."));
 
   // Step 2: Check if a Dart project can be found in [projectPathUri].
 
@@ -137,10 +139,10 @@ runTests(
   try {
     dartProject.checkProject();
   } catch (e) {
-    stderr.writeln(redPen("$e\n"));
+    stderr.writeln(_redPen("$e\n"));
     exit(2);
   }
-  print(greenPen("Found project \"${dartProject.pubSpecYaml["name"]}\"."));
+  print(_greenPen("Found project \"${dartProject.pubSpecYaml["name"]}\"."));
 
   // Step 3: Detect all unit tests and extract their configuration.
 
@@ -149,20 +151,20 @@ runTests(
     dartProject.findTests(tests);
   } catch (e) {
     stdout.write("\n");
-    stderr.writeln(redPen("$e\n"));
+    stderr.writeln(_redPen("$e\n"));
     exit(2);
   }
 
   List<TestConfiguration> partialListOfTests = new List();
 
   // Initialise the display of the test detection process
-  displayTestCount(partialListOfTests, false, skipBrowserTests, true);
+  _displayTestCount(partialListOfTests, false, skipBrowserTests, true);
 
   dartProject.tests
     // Display tests found progress.
     ..listen((TestConfiguration conf) {
       partialListOfTests.add(conf);
-      displayTestCount(partialListOfTests, true, skipBrowserTests, true);
+      _displayTestCount(partialListOfTests, true, skipBrowserTests, true);
     })
 
     // Display final test count.
@@ -173,12 +175,12 @@ runTests(
         if (!Platform.isWindows) {
           print('\x1b[2A');
         }
-        stderr.writeln(redPen("No tests files were found."
+        stderr.writeln(_redPen("No tests files were found."
             "                                   \n"));
         exit(3);
       }
 
-      displayTestCount(tests, true, skipBrowserTests, false);
+      _displayTestCount(tests, true, skipBrowserTests, false);
 
       // Step 3 bis: Check if browser binaries have been set correctly.
 
@@ -193,13 +195,13 @@ runTests(
         try {
           dartBinaries.checkBrowserBinaries();
         } catch (e) {
-          stderr.writeln(redPen("$e"));
-          stderr.writeln(redPen("You can choose to skip all browser tests by "
+          stderr.writeln(_redPen("$e"));
+          stderr.writeln(_redPen("You can choose to skip all browser tests by "
               "using the --skip-browser-tests option and this binary won't be "
               "needed.\n"));
           exit(2);
         }
-        print(greenPen("Browser binaries OK."));
+        print(_greenPen("Browser binaries OK."));
       } else if (skipBrowserTests) {
         // If skipBrowserTests is true we remove all Browser tests.
         tests = tests.where(
@@ -218,31 +220,31 @@ runTests(
           // As soon as each test is finished we display the results.
           if (verbose) print("");
           if (result.success) {
-            print(greenPen("Test suite passed: ${result.test.testFileName}"));
+            print(_greenPen("Test suite passed: ${result.test.testFileName}"));
           } else {
-            print(redPen("Test suite failed: ${result.test.testFileName}"));
+            print(_redPen("Test suite failed: ${result.test.testFileName}"));
           }
           if (verbose || !result.success) {
             print("Detailed results of test suite "
                 "${result.test.testFileName}:");
-            print(makeWindowsCompatible("┌───────────────────────────────"
+            print(_makeWindowsCompatible("┌───────────────────────────────"
                   "${result.test.testFileName.replaceAll(
                       new RegExp(r'.'), '─')}"));
             if (result.testOutput.trim() != ""
                 || result.testErrorOutput.trim() != "") {
               print(result.testOutput.trim()
               .replaceAll("\r", "")
-              .replaceAll(new RegExp(r"^"), makeWindowsCompatible("│ "))
-              .replaceAll("\n", makeWindowsCompatible("\n│ ")));
+              .replaceAll(new RegExp(r"^"), _makeWindowsCompatible("│ "))
+              .replaceAll("\n", _makeWindowsCompatible("\n│ ")));
               if (result.testErrorOutput.trim() != "")
                 print(result.testErrorOutput.trim()
                 .replaceAll("\r", "")
-                .replaceAll(new RegExp(r"^"), makeWindowsCompatible("│ "))
-                .replaceAll("\n", makeWindowsCompatible("\n│ ")));
+                .replaceAll(new RegExp(r"^"), _makeWindowsCompatible("│ "))
+                .replaceAll("\n", _makeWindowsCompatible("\n│ ")));
             } else {
-              print(makeWindowsCompatible("│ There was no test output."));
+              print(_makeWindowsCompatible("│ There was no test output."));
             }
-            print(makeWindowsCompatible("└───────────────────────────────"
+            print(_makeWindowsCompatible("└───────────────────────────────"
             "${result.test.testFileName.replaceAll(
                 new RegExp(r'.'), '─')}"));
           }
@@ -260,17 +262,17 @@ runTests(
           List<TestExecutionResult> failedTestResults =
               results.where((TestExecutionResult t) => !t.success).toList();
           if (failedTestResults.length == 0) {
-            print(greenPen("\nSummary: ALL ${results.length} TEST SUITE(S) "
+            print(_greenPen("\nSummary: ALL ${results.length} TEST SUITE(S) "
                 "PASSED.\n"));
             exit(0);
           } else if (failedTestResults.length == results.length) {
-            print(redPen("\nSummary: ALL ${failedTestResults.length} "
+            print(_redPen("\nSummary: ALL ${failedTestResults.length} "
                "TEST SUITE(S) FAILED.\n"));
             exit(1);
           } else {
             print("\nSummary: "
-                + redPen("${failedTestResults.length} TEST SUITE(S) FAILED. ")
-                + greenPen("${results.length - failedTestResults.length} TEST "
+                + _redPen("${failedTestResults.length} TEST SUITE(S) FAILED. ")
+                + _greenPen("${results.length - failedTestResults.length} TEST "
                     "SUITE(S) PASSED.\n"));
             exit(1);
           }
@@ -279,7 +281,7 @@ runTests(
 }
 
 /// Displays the information about [tests] found.
-void displayTestCount(List<TestConfiguration> tests, bool erasePreviousLines,
+void _displayTestCount(List<TestConfiguration> tests, bool erasePreviousLines,
                       bool skipBrowserTests, bool partial) {
   if (erasePreviousLines && !Platform.isWindows) {
     print('\x1b[3A');
@@ -294,12 +296,13 @@ void displayTestCount(List<TestConfiguration> tests, bool erasePreviousLines,
     List<TestConfiguration> browserTests = tests.where(
             (TestConfiguration t) => t.testType is BrowserTest).toList();
 
-    print(greenPen("Found ${tests.length} test suites "
-        "(${tests.length - browserTests.length} "
-        "Standalone VM, ${browserTests.length} Dartium)."
-        + (partial ? ".." : "  ")));
+    print(_greenPen("Found ${tests.length} test suites "
+    "(${tests.length - browserTests.length} "
+    "Standalone VM, ${browserTests.length} Dartium)."
+    + (partial ? ".." : "  ")));
+
     if (browserTests.length > 0 && skipBrowserTests) {
-      print(orangePen("Dartium tests will be skipped!"));
+      print(_orangePen("Dartium tests will be skipped!"));
       if (partial && !Platform.isWindows) {
         print('\x1b[3A');
       }
@@ -307,7 +310,7 @@ void displayTestCount(List<TestConfiguration> tests, bool erasePreviousLines,
   }
 }
 
-String makeWindowsCompatible(String s) {
+String _makeWindowsCompatible(String s) {
   if(Platform.isWindows) {
     return s.replaceAll("┌", ".")
             .replaceAll("─", "-")
