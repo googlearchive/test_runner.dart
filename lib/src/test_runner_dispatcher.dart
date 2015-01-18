@@ -63,12 +63,11 @@ class TestRunnerDispatcher {
           testRunner.runTest(test)
               // Kill the test after a set amount of time. Timeout.
               .timeout(new Duration(seconds: TESTS_TIMEOUT_SEC), onTimeout: () {
-                TestExecutionResult result = new TestExecutionResult(test);
-                result.success = false;
-                result.testOutput = "The test did not complete in less than "
+                var testOutput = "The test did not complete in less than "
                                     "$TESTS_TIMEOUT_SEC seconds. "
                                     "It was aborted.";
-                return result;
+
+                return new TestExecutionResult(test, success: false, testOutput: testOutput);
               })..then((TestExecutionResult result) {
                 controller.add(result);
           }));

@@ -2,7 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-library test_execution_result.dart;
+library test_runner.test_execution_result;
 
 import 'test_configuration.dart';
 
@@ -14,24 +14,30 @@ class TestExecutionResult {
       {this.success: true, this.testOutput: "", this.testErrorOutput: ""});
 
   /// Construct a new [TestExecutionResult] from JSON.
-  TestExecutionResult.fromJson(var json, this.test) {
-    success = json["success"];
-    testOutput = json["testOutput"];
-    testErrorOutput = json["testErrorOutput"];
+  factory TestExecutionResult.fromJson(
+      Map<String, dynamic> json, TestConfiguration test) {
+    var success = json["success"];
+    var testOutput = json["testOutput"];
+    var testErrorOutput = json["testErrorOutput"];
     if (success == null || testOutput == null || testErrorOutput == null) {
       throw new ArgumentError("TestExecutionResult JSON is missing values.");
     }
+
+    return new TestExecutionResult(test,
+        success: success,
+        testOutput: testOutput,
+        testErrorOutput: testErrorOutput);
   }
 
   /// [true] if the test file succeeded.
-  bool success;
+  final bool success;
 
   /// What was printed on the standard output by the [UnitTest] library.
-  String testOutput;
+  final String testOutput;
 
   /// What was printed on the error output by the [UnitTest] library.
-  String testErrorOutput;
+  final String testErrorOutput;
 
   /// Pointer to the test.
-  TestConfiguration test;
+  final TestConfiguration test;
 }

@@ -70,26 +70,29 @@ class BrowserTestRunner extends TestRunner {
           .run(dartBinaries.contentShellBin,
               ["--args", "--dump-render-tree",
                "--disable-gpu", testUrl], runInShell: false)
-          .then(
-              (ProcessResult testProcessResult) {
-                if (testProcessResult.stdout.contains("#CRASHED")) {
-                  throw new Exception("Error: Content shell crashed.");
-                }
-                TestExecutionResult result = new TestExecutionResult(test);
-                result.success = testProcessResult.stdout.contains("PASS\n");
-                result.testOutput = testProcessResult.stdout
-                    .replaceAll("unittest-suite-wait-for-done", "")
-                    .replaceAll("#EOF", "")
-                    .replaceAll("#READY", "")
-                    .replaceAll("CONSOLE MESSAGE: Warning: The "
-                        "unittestConfiguration has already been set. New "
-                        "unittestConfiguration ignored.", "")
-                    .replaceAll("Content-Type: text/plain", "");
-                result.testErrorOutput = testProcessResult.stderr
-                    .replaceAll("#EOF", "");
-                completer.complete(result);
-              }
-      );
+          .then((ProcessResult testProcessResult) {
+        if (testProcessResult.stdout.contains("#CRASHED")) {
+          throw new Exception("Error: Content shell crashed.");
+        }
+        var success = testProcessResult.stdout.contains("PASS\n");
+        var testOutput = testProcessResult.stdout
+            .replaceAll("unittest-suite-wait-for-done", "")
+            .replaceAll("#EOF", "")
+            .replaceAll("#READY", "")
+            .replaceAll("CONSOLE MESSAGE: Warning: The "
+                "unittestConfiguration has already been set. New "
+                "unittestConfiguration ignored.", "").replaceAll(
+                "Content-Type: text/plain", "");
+        var testErrorOutput = testProcessResult.stderr
+            .replaceAll("#EOF", "");
+
+        TestExecutionResult result = new TestExecutionResult(test,
+            success: success,
+            testOutput: testOutput,
+            testErrorOutput: testErrorOutput);
+
+        completer.complete(result);
+      });
 
       // TODO: enable code coverage data gathering when
       //       https://code.google.com/p/dart/issues/detail?id=20293 is fixed.

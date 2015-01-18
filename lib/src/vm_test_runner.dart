@@ -42,13 +42,15 @@ class VmTestRunner extends TestRunner {
         .run(dartBinaries.pubBin, ["run", newTestFilePath],
             runInShell: false, workingDirectory: dartProject.projectPath)
         .then((ProcessResult testProcess) {
-      TestExecutionResult result = new TestExecutionResult(test);
-      result.success = testProcess.exitCode == 0;
-      result.testOutput =
+      var success = testProcess.exitCode == 0;
+      var testOutput =
           testProcess.stdout.replaceAll("unittest-suite-wait-for-done", "");
-      result.testErrorOutput = testProcess.stderr;
+      var testErrorOutput = testProcess.stderr;
 
-      return result;
+      return new TestExecutionResult(test,
+          success: success,
+          testOutput: testOutput,
+          testErrorOutput: testErrorOutput);
     });
   }
 }
