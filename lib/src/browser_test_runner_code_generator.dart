@@ -7,13 +7,14 @@ library test_runner.browser_test_runner_code_generator;
 import 'dart:async';
 import 'dart:io';
 
+import 'dart_project.dart';
 import 'test_runner_code_generator.dart';
 
 /// Generates the files necessary for the Browser Tests tu run.
 class BrowserTestRunnerCodeGenerator extends TestRunnerCodeGenerator {
 
   /// Constructor.
-  BrowserTestRunnerCodeGenerator(dartProject) : super(dartProject);
+  BrowserTestRunnerCodeGenerator(DartProject dartProject) : super(dartProject);
 
   /// Creates the HTML file for the test. If the test does not have a custom
   /// [testHtmlFilePath] then a default one (defined by

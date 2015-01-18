@@ -9,13 +9,14 @@ import 'dart:io';
 
 import 'package:unittest/unittest.dart';
 
+import 'dart_project.dart';
 import 'test_runner_code_generator.dart';
 
 /// Generates the files necessary for the Browser Tests to run.
 class VmTestRunnerCodeGenerator extends TestRunnerCodeGenerator {
 
   /// Constructor.
-  VmTestRunnerCodeGenerator(dartProject) : super(dartProject);
+  VmTestRunnerCodeGenerator(DartProject dartProject) : super(dartProject);
 
   /// Creates the intermediary Dart file that sets the unittest [Configuration].
   Future createTestDartFile(String testFileName) {
