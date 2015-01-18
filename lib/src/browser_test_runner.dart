@@ -8,9 +8,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:coverage/src/devtools.dart';
-import 'package:coverage/src/util.dart';
-
 import 'dart_binaries.dart';
 import 'dart_project.dart';
 import 'test_configuration.dart';
@@ -24,18 +21,14 @@ class BrowserTestRunner extends TestRunner {
 
   /// Port to be used by the [WebServer] serving the test files.
   // TODO: randomize port if already used.
-  static const int WEB_SERVER_PORT = 7478;
-
-  /// Port to be used by the [WebServer] serving the test files.
-  // TODO: randomize port if already used instead of incrementing.
-  static int observatoryPort = 8887;
+  static const int _WEB_SERVER_PORT = 7478;
 
   /// Host to be used by the [WebServer] serving the test files.
-  static const String WEB_SERVER_HOST = "127.0.0.1";
+  static const String _WEB_SERVER_HOST = "127.0.0.1";
 
   /// Points to the [Completer]s that will indicate if pub serve is ready for a
   /// given project absolute path.
-  static final Map<String, Completer> pubServerCompleters = new Map();
+  static final Map<String, Completer> _pubServerCompleters = new Map();
 
   /// Pointers to all Dart SDK binaries.
   final DartBinaries dartBinaries;
@@ -64,7 +57,7 @@ class BrowserTestRunner extends TestRunner {
     // when all the test files have been generated.
     Future.wait([htmlFileFuture, dartFileFuture, httpServer]).then((_) {
 
-      String testUrl = buildBrowserTestUrl(test.testFileName);
+      String testUrl = _buildBrowserTestUrl(test.testFileName);
 
       Process
           .run(dartBinaries.contentShellBin,
@@ -96,8 +89,8 @@ class BrowserTestRunner extends TestRunner {
 
       // TODO: enable code coverage data gathering when
       //       https://code.google.com/p/dart/issues/detail?id=20293 is fixed.
+      // import 'coverage.dart'
       //startCodeCoverageListener();
-      observatoryPort++;
     });
 
     return completer.future;
@@ -110,7 +103,7 @@ class BrowserTestRunner extends TestRunner {
     // Check if there is already pub serve running (or being started) for this
     // project.
     Completer pubServerCompleter =
-        pubServerCompleters[dartProject.testDirectory.path];
+        _pubServerCompleters[dartProject.testDirectory.path];
 
     if (pubServerCompleter != null) {
       return pubServerCompleter.future;
@@ -118,10 +111,10 @@ class BrowserTestRunner extends TestRunner {
 
     // Start pub serve to serve the test directory of the project.
     pubServerCompleter = new Completer();
-    pubServerCompleters[dartProject.testDirectory.path] = pubServerCompleter;
+    _pubServerCompleters[dartProject.testDirectory.path] = pubServerCompleter;
 
     Process.start(dartBinaries.pubBin,
-                  ["serve", "test", "--port", "$WEB_SERVER_PORT"],
+                  ["serve", "test", "--port", "$_WEB_SERVER_PORT"],
                   workingDirectory: dartProject.projectPath).then(
         (Process process) {
           process.stdout.transform(new Utf8Decoder())
@@ -139,55 +132,10 @@ class BrowserTestRunner extends TestRunner {
   }
 
   /// Returns the URL that will run the given browser test file.
-  String buildBrowserTestUrl(String testFileName) {
-    return "http://$WEB_SERVER_HOST:$WEB_SERVER_PORT/"
+  String _buildBrowserTestUrl(String testFileName) {
+    return "http://$_WEB_SERVER_HOST:$_WEB_SERVER_PORT/"
         "${GENERATED_TEST_FILES_DIR_NAME}/"
         "${testFileName.replaceFirst(new RegExp(r"\.dart$"), ".html")}";
-  }
-
-  /// Listens for an Observatory on the [observatoryPort] and retrieves the code
-  /// coverage data when available.
-  // This is experimental.
-  // TODO: move code coverage logic to a separate class and build an interface
-  //       to retrieve code coverage from the TestRunnerDispatcher.
-  void startCodeCoverageListener() {
-    var port = observatoryPort;
-
-    onTimeout() {
-      var timeout = 2;
-      print('Failed to collect coverage within ${timeout}s');
-    }
-    Future connected = retry(() => Observatory.connect("127.0.0.1", "$port"),
-        new Duration(milliseconds:100));
-    connected.timeout(new Duration(seconds:2), onTimeout: onTimeout);
-    connected.then((observatory) {
-      Future ready = new Future.value();
-      ready.timeout(new Duration(seconds:2), onTimeout: onTimeout);
-
-      return ready.then((_) => getAllCoverage(observatory))
-      .then(JSON.encode)
-      .then((json) {
-        // TODO: do something with the result of the gathered code coverage
-        //       instead of just printing it.
-        print(json);
-        observatory.close();
-      });
-    });
-  }
-
-  /// Returns a JSON object containing code coverage data for all Isolates given
-  /// an [Observatory].
-  // This is experimental.
-  static Future<Map> getAllCoverage(Observatory observatory) {
-    return observatory
-        .getIsolates()
-        .then((isolates) => isolates.map((i) => i.getCoverage()))
-        .then(Future.wait)
-        .then((responses) {
-      // flatten response lists
-      var allCoverage = responses.expand((it) => it).toList();
-      return {'type': 'CodeCoverage', 'coverage': allCoverage,};
-    });
   }
 }
 
