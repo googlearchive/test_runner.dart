@@ -199,42 +199,34 @@ class BrowserTestRunnerCodeGenerator extends TestRunnerCodeGenerator {
   /// [DEFAULT_HTML_TEST_FILE_TEMPLATE_PATH]) will be used to run the browser
   /// test in.
   Future createTestHtmlFile(String testFileName, [String testHtmlFilePath]) {
-    Completer completer = new Completer();
-
-    Future<String> htmlFileReader;
-
-    if (testHtmlFilePath == null || testHtmlFilePath == "") {
-      // If the test does not have an associated test file we'll call the test
-      // file inside of a default HTML file.
-      htmlFileReader = (new Completer<String>()
-        ..complete(_BROWSER_TEST_HTML_FILE_TEMPLATE)).future;
-    } else {
-      // Custom HTML test files.
-      htmlFileReader = new File(testHtmlFilePath).readAsString();
-    }
-
-    // Read the content of the file.
-    htmlFileReader.then((String htmlFileString) {
-
+    return new Future(() {
+      if (testHtmlFilePath == null || testHtmlFilePath == "") {
+        // If the test does not have an associated test file we'll call the test
+        // file inside of a default HTML file.
+        return _BROWSER_TEST_DART_FILE_TEMPLATE;
+      } else {
+        // Custom HTML test files.
+        return new File(testHtmlFilePath).readAsString();
+      }
+    }).then((String htmlFileString) {
       if (testHtmlFilePath == null || testHtmlFilePath == "") {
         htmlFileString =
             htmlFileString.replaceAll("{{test_file_name}}", testFileName);
-
       } else {
         // For custom HTML test files we add a call to
         // unittest/test_controller.js and we replace the Dart test file call by
         // the intermediary Dart test file that injects the unittest
         // Configuration.
         if (!htmlFileString.contains("packages/unittest/test_controller.js")) {
-          htmlFileString = htmlFileString.replaceFirst(
-              "</body>", '<script type="text/javascript" '
+          htmlFileString = htmlFileString.replaceFirst("</body>",
+              '<script type="text/javascript" '
               'src="/packages/unittest/test_controller.js"></script></body>');
         }
       }
 
       // Create the file (and delete it if it already exists).
-      String generatedFilePath = '${generatedTestFilesDirectory.path}/'
-          + '${testFileName.replaceAll(new RegExp(r'\.dart$'), '.html')}';
+      String generatedFilePath = '${generatedTestFilesDirectory.path}/' +
+          '${testFileName.replaceAll(new RegExp(r'\.dart$'), '.html')}';
       File generatedFile = new File(generatedFilePath);
       if (generatedFile.existsSync()) {
         generatedFile.deleteSync();
@@ -243,10 +235,7 @@ class BrowserTestRunnerCodeGenerator extends TestRunnerCodeGenerator {
 
       // Write into the [File].
       generatedFile.writeAsStringSync(htmlFileString);
-      completer.complete();
     });
-
-    return completer.future;
   }
 
   /// Creates the intermediary Dart file that sets the unittest [Configuration].
@@ -317,4 +306,3 @@ BSD-style license that can be found in the LICENSE file. -->
   </body>
 </html>
 ''';
-
