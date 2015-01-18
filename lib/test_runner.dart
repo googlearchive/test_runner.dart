@@ -32,8 +32,8 @@ abstract class TestRunner {
 class TestExecutionResult {
 
   /// Constructor.
-  TestExecutionResult(this.test, {this.success: true, this.testOutput: "",
-      this.testErrorOutput: ""});
+  TestExecutionResult(this.test,
+      {this.success: true, this.testOutput: "", this.testErrorOutput: ""});
 
   /// Construct a new [TestExecutionResult] from JSON.
   TestExecutionResult.fromJson(var json, this.test) {
@@ -76,7 +76,7 @@ class TestRunnerDispatcher {
   /// Constructor. You can specify the maximum number of tests that can run in
   /// parallel with [maxProcesses].
   TestRunnerDispatcher(this.dartBinaries, this.dartProject,
-                       {int maxProcesses: 4}) {
+      {int maxProcesses: 4}) {
     pool = new Pool(maxProcesses);
   }
 
