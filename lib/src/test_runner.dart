@@ -11,6 +11,6 @@ import 'test_execution_result.dart';
 
 abstract class TestRunner {
 
-  /// Runs the [test] and returns the [TestExecutionResult].
-  Future<TestExecutionResult> runTest(TestConfiguration test);
+  /// Runs the [testConfiguration] and returns the [TestExecutionResult].
+  Future<TestExecutionResult> runTest(TestConfiguration testConfiguration);
 }
