@@ -28,6 +28,9 @@ class DartBinaries {
 
   DartBinaries(this.contentShellBin, this.pubBin, this.dart2jsBin);
 
+  factory DartBinaries.withDefaults() =>
+      new DartBinaries(CONTEST_SHELL_BIN_NAME, PUB_BIN_NAME, DART2JS_BIN_NAME);
+
   /// Checks that all the Dart SDK binaries are accessible and working.
   /// If some binaries are not in the PATH a [ArgumentError] will be thrown.
   void checkDartSdkBinaries() {
