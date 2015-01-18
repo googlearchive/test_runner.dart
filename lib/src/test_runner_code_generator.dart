@@ -14,24 +14,25 @@ import 'util.dart';
 abstract class TestRunnerCodeGenerator {
 
   /// Directory where all the generated test runner files are created.
-  Directory generatedTestFilesDirectory;
+  final Directory generatedTestFilesDirectory;
 
   /// Pointers to the Dart Project containing the tests.
   final DartProject dartProject;
 
   /// Constructor.
-  TestRunnerCodeGenerator(this.dartProject) {
-    generatedTestFilesDirectory = _createGeneratedTestFilesDirectory();
-  }
+  TestRunnerCodeGenerator(DartProject dartProject)
+      : this.dartProject = dartProject,
+        generatedTestFilesDirectory =
+            _createGeneratedTestFilesDirectory(dartProject);
 
   /// Returns the directory named [GENERATED_TEST_FILES_DIR_NAME] in the
   /// [dartProject]'s test directory and creates it if it doesn't exists.
   ///
   /// Throws a [FileExistsException] if there is already a [FileSystemEntity]
   /// with the same name that's not a [Directory].
-  Directory _createGeneratedTestFilesDirectory() {
+  static Directory _createGeneratedTestFilesDirectory(DartProject proj) {
     String generatedTestFilesDirectoryPath =
-        dartProject.testDirectory.resolveSymbolicLinksSync() + "/"
+        proj.testDirectory.resolveSymbolicLinksSync() + "/"
             + GENERATED_TEST_FILES_DIR_NAME;
 
     Directory newGeneratedSourceDir =

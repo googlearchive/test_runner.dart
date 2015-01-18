@@ -35,7 +35,7 @@ class BrowserTestRunner extends TestRunner {
 
   /// Points to the [Completer]s that will indicate if pub serve is ready for a
   /// given project absolute path.
-  static Map<String, Completer> pubServerCompleters = new Map();
+  static final Map<String, Completer> pubServerCompleters = new Map();
 
   /// Pointers to all Dart SDK binaries.
   final DartBinaries dartBinaries;
@@ -252,7 +252,7 @@ class BrowserTestRunnerCodeGenerator extends TestRunnerCodeGenerator {
   /// Creates the intermediary Dart file that sets the unittest [Configuration].
   Future createTestDartFile(String testFileName) {
 
-    // Read the content fo the template Dart file.
+    // Read the content for the template Dart file.
     String dartFileString = _BROWSER_TEST_DART_FILE_TEMPLATE;
 
     // Replaces templated values.

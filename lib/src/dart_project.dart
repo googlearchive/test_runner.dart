@@ -36,13 +36,12 @@ class DartProject {
   Stream<TestConfiguration> tests;
 
   /// Pool that limits the number of concurrently running tests.
-  Pool pool;
+  final Pool _pool;
 
   /// Constructor. You can specify the maximum number of tests detection
   /// processes that can run in parallel with [maxProcesses].
-  DartProject(this.projectPath, this.dartBinaries, {int maxProcesses: 4}) {
-    pool = new Pool(maxProcesses);
-  }
+  DartProject(this.projectPath, this.dartBinaries, {int maxProcesses: 4})
+      : _pool = new Pool(maxProcesses);
 
   /// Check if a Dart project can be found in [projectPath] and loads its
   /// pubspec.yaml values into [pubSpecYaml].
@@ -149,7 +148,7 @@ class DartProject {
     // Check if the files listed could be a Dart test and extract each test
     // configuration.
     for (FileSystemEntity file in files) {
-      Future<TestConfiguration> testConfFuture = pool.withResource(() =>
+      Future<TestConfiguration> testConfFuture = _pool.withResource(() =>
           extractTestConf(file)
               ..then((TestConfiguration testConf) {
                 if (testConf != null) {

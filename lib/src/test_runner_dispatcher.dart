@@ -21,20 +21,18 @@ class TestRunnerDispatcher {
   static const int TESTS_TIMEOUT_SEC = 240;
 
   /// Pointers to all Dart SDK binaries.
-  DartBinaries dartBinaries;
+  final DartBinaries dartBinaries;
 
   /// The Dart project containing the tests.
-  DartProject dartProject;
+  final DartProject dartProject;
 
   /// Pool that limits the number of concurrently running tests.
-  Pool pool;
+  final Pool _pool;
 
   /// Constructor. You can specify the maximum number of tests that can run in
   /// parallel with [maxProcesses].
   TestRunnerDispatcher(this.dartBinaries, this.dartProject,
-      {int maxProcesses: 4}) {
-    pool = new Pool(maxProcesses);
-  }
+      {int maxProcesses: 4}) :     _pool = new Pool(maxProcesses);
 
   /// Runs all the given [tests].
   ///
@@ -61,7 +59,7 @@ class TestRunnerDispatcher {
       }
 
       // Execute test and send result to the stream.
-      Future<TestExecutionResult> stuff = pool.withResource(() =>
+      Future<TestExecutionResult> stuff = _pool.withResource(() =>
           testRunner.runTest(test)
               // Kill the test after a set amount of time. Timeout.
               .timeout(new Duration(seconds: TESTS_TIMEOUT_SEC), onTimeout: () {
