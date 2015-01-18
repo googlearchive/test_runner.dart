@@ -32,7 +32,7 @@ class TestRunnerDispatcher {
   /// Constructor. You can specify the maximum number of tests that can run in
   /// parallel with [maxProcesses].
   TestRunnerDispatcher(this.dartBinaries, this.dartProject,
-      {int maxProcesses: 4}) :     _pool = new Pool(maxProcesses);
+      {int maxProcesses: 4}) : _pool = new Pool(maxProcesses);
 
   /// Runs all the given [tests].
   ///
@@ -59,18 +59,20 @@ class TestRunnerDispatcher {
       }
 
       // Execute test and send result to the stream.
-      Future<TestExecutionResult> stuff = _pool.withResource(() =>
-          testRunner.runTest(test)
-              // Kill the test after a set amount of time. Timeout.
-              .timeout(new Duration(seconds: TESTS_TIMEOUT_SEC), onTimeout: () {
-                var testOutput = "The test did not complete in less than "
-                                    "$TESTS_TIMEOUT_SEC seconds. "
-                                    "It was aborted.";
+      Future<TestExecutionResult> stuff = _pool.withResource(() => testRunner
+          .runTest(test)
+          // Kill the test after a set amount of time. Timeout.
+          .timeout(new Duration(seconds: TESTS_TIMEOUT_SEC), onTimeout: () {
+        var testOutput = "The test did not complete in less than "
+            "$TESTS_TIMEOUT_SEC seconds. "
+            "It was aborted.";
 
-                return new TestExecutionResult(test, success: false, testOutput: testOutput);
-              })..then((TestExecutionResult result) {
-                controller.add(result);
-          }));
+        return new TestExecutionResult(test,
+            success: false, testOutput: testOutput);
+      })
+        ..then((TestExecutionResult result) {
+          controller.add(result);
+        }));
 
       // Adding the test Future to the list of tests to watch.
       testRunnerResultFutures.add(stuff);
@@ -82,4 +84,3 @@ class TestRunnerDispatcher {
     return controller.stream;
   }
 }
-
