@@ -32,34 +32,26 @@ class VmTestRunner extends TestRunner {
   @override
   Future<TestExecutionResult> runTest(TestConfiguration test) {
 
-    Completer<TestExecutionResult> completer =
-        new Completer<TestExecutionResult>();
-
     // Generate the file that will force the [VmTestConfiguration] for unittest.
-    VmTestRunnerCodeGenerator codeGenerator
-        = new VmTestRunnerCodeGenerator(dartProject);
+    VmTestRunnerCodeGenerator codeGenerator =
+        new VmTestRunnerCodeGenerator(dartProject);
     codeGenerator.createTestDartFile(test.testFileName);
 
     String newTestFilePath =
-        "./test/" + GENERATED_TEST_FILES_DIR_NAME
-        + "/" + test.testFileName;
+        "./test/" + GENERATED_TEST_FILES_DIR_NAME + "/" + test.testFileName;
 
-    Process
-        .run(dartBinaries.pubBin,
-             ["run", newTestFilePath],
-             runInShell: false, workingDirectory: dartProject.projectPath)
-        .then(
-        (ProcessResult testProcess) {
-          TestExecutionResult result = new TestExecutionResult(test);
-          result.success = testProcess.exitCode == 0;
-          result.testOutput = testProcess.stdout
-              .replaceAll("unittest-suite-wait-for-done", "");
-          result.testErrorOutput = testProcess.stderr;
-          completer.complete(result);
-        }
-    );
+    return Process
+        .run(dartBinaries.pubBin, ["run", newTestFilePath],
+            runInShell: false, workingDirectory: dartProject.projectPath)
+        .then((ProcessResult testProcess) {
+      TestExecutionResult result = new TestExecutionResult(test);
+      result.success = testProcess.exitCode == 0;
+      result.testOutput =
+          testProcess.stdout.replaceAll("unittest-suite-wait-for-done", "");
+      result.testErrorOutput = testProcess.stderr;
 
-    return completer.future;
+      return result;
+    });
   }
 }
 
@@ -79,8 +71,8 @@ class VmTestRunnerCodeGenerator extends TestRunnerCodeGenerator {
         dartFileString.replaceAll("{{test_file_name}}", testFileName);
 
     // Create the file (and delete it if it already exists).
-    String generatedFilePath = '${generatedTestFilesDirectory.path}/'
-        + '$testFileName';
+    String generatedFilePath =
+        '${generatedTestFilesDirectory.path}/' + '$testFileName';
     File generatedFile = new File(generatedFilePath);
     if (generatedFile.existsSync()) {
       generatedFile.deleteSync();
