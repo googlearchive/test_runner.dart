@@ -4,7 +4,9 @@
 
 library test_runner;
 
+import 'dart:async';
 import 'dart:io';
+
 import 'package:ansicolor/ansicolor.dart';
 import 'package:unscripted/unscripted.dart';
 
@@ -92,7 +94,7 @@ void runTests(
   // Find out if user has passed a list of test files or a Dart project folder.
 
   String projectPath;
-  List<String> tests = new List();
+  List<String> testPaths = new List();
   if (projectOrTests == null || projectOrTests.length == 0) {
     projectPath = "./";
   } else {
@@ -109,7 +111,7 @@ void runTests(
     } else if (!allDartFiles && projectOrTests.length == 1) {
       projectPath = projectOrTests[0];
     } else {
-      tests = projectOrTests;
+      testPaths = projectOrTests;
       projectPath = projectOrTests[0].substring(0,
           projectOrTests[0].lastIndexOf("test/") + 5);
     }
@@ -144,28 +146,17 @@ void runTests(
   // Step 3: Detect all unit tests and extract their configuration.
 
   stdout.write("\nLooking for test suites...");
+
+  Stream<TestConfiguration> testStream;
   try {
-    dartProject.findTests(tests);
+    testStream = dartProject.findTests(testPaths);
   } catch (e) {
     stdout.write("\n");
     stderr.writeln(_redPen("$e\n"));
     exit(2);
   }
 
-  List<TestConfiguration> partialListOfTests = new List();
-
-  // Initialise the display of the test detection process
-  _displayTestCount(partialListOfTests, false, skipBrowserTests, true);
-
-  dartProject.tests
-    // Display tests found progress.
-    ..listen((TestConfiguration conf) {
-      partialListOfTests.add(conf);
-      _displayTestCount(partialListOfTests, true, skipBrowserTests, true);
-    })
-
-    // Display final test count.
-    ..toList().then((List<TestConfiguration> tests) {
+  _configToListAndLog(testStream, skipBrowserTests).then((List<TestConfiguration> tests) {
 
       // Error if no tests were found.
       if (tests == null || tests.length == 0) {
@@ -201,8 +192,7 @@ void runTests(
         print(_greenPen("Browser binaries OK."));
       } else if (skipBrowserTests) {
         // If skipBrowserTests is true we remove all Browser tests.
-        tests = tests.where(
-            (TestConfiguration t) => !(t.testType is BrowserTest)).toList();
+        tests.removeWhere((config) => !(config.testType is BrowserTest));
       }
 
       // Step 4: Run all tests and catch their output so that we can print it on
@@ -275,6 +265,20 @@ void runTests(
           }
         });
   });
+}
+
+Future<List<TestConfiguration>> _configToListAndLog(
+    Stream<TestConfiguration> testStream, bool skipBrowserTests) {
+
+  List<TestConfiguration> partialListOfTests = new List();
+
+  // Initialise the display of the test detection process
+  _displayTestCount(partialListOfTests, false, skipBrowserTests, true);
+
+  return testStream.forEach((conf) {
+    partialListOfTests.add(conf);
+    _displayTestCount(partialListOfTests, true, skipBrowserTests, true);
+  }).then((_) => partialListOfTests);
 }
 
 /// Displays the information about [tests] found.

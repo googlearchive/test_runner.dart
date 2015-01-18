@@ -32,9 +32,6 @@ class DartProject {
   /// YAML data of the pubspec.yaml file.
   var pubSpecYaml;
 
-  /// List of tests to run.
-  Stream<TestConfiguration> tests;
-
   /// Pool that limits the number of concurrently running tests.
   final Pool _pool;
 
@@ -96,7 +93,6 @@ class DartProject {
 
     StreamController<TestConfiguration> controller =
         new StreamController.broadcast();
-    tests = controller.stream;
 
     List<Future<TestConfiguration>> testConfFutureList = new List();
 
@@ -113,7 +109,7 @@ class DartProject {
     } on StateError catch(e) {
       // No "test" folder so no tests to run.
       controller.close();
-      return tests;
+      return controller.stream;
     }
 
     // Will list all files to be analyzed.
@@ -149,7 +145,7 @@ class DartProject {
     // configuration.
     for (FileSystemEntity file in files) {
       Future<TestConfiguration> testConfFuture = _pool.withResource(() =>
-          extractTestConf(file)
+          _extractTestConf(file)
               ..then((TestConfiguration testConf) {
                 if (testConf != null) {
                   controller.add(testConf);
@@ -160,13 +156,13 @@ class DartProject {
 
     // Notify the StreamController when all testConfig have been extracted.
     Future.wait(testConfFutureList).then((_) => controller.close());
-    return tests;
+    return controller.stream;
   }
 
   /// Extracts the given test [file]'s configuration. If the [file] is not a
   /// test [null] is returned.
   // TODO: add annotation extraction to configure tests.
-  Future<TestConfiguration> extractTestConf(FileSystemEntity file) {
+  Future<TestConfiguration> _extractTestConf(FileSystemEntity file) {
 
     Completer completer = new Completer();
 
