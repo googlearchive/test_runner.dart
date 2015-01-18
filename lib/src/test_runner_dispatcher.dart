@@ -16,9 +16,7 @@ import 'vm_test_runner.dart';
 
 /// Properly dispatch running tests to the correct [TestRunner].
 class TestRunnerDispatcher {
-
-  /// Number of seconds to wait until the test times out.
-  static const int TESTS_TIMEOUT_SEC = 240;
+  static const _defaultTimeout = const Duration(seconds: 240);
 
   /// Pointers to all Dart SDK binaries.
   final DartBinaries dartBinaries;
@@ -59,23 +57,13 @@ class TestRunnerDispatcher {
       }
 
       // Execute test and send result to the stream.
-      Future<TestExecutionResult> stuff = _pool.withResource(() => testRunner
-          .runTest(test)
-          // Kill the test after a set amount of time. Timeout.
-          .timeout(new Duration(seconds: TESTS_TIMEOUT_SEC), onTimeout: () {
-        var testOutput = "The test did not complete in less than "
-            "$TESTS_TIMEOUT_SEC seconds. "
-            "It was aborted.";
-
-        return new TestExecutionResult(test,
-            success: false, testOutput: testOutput);
-      })
-        ..then((TestExecutionResult result) {
-          controller.add(result);
-        }));
+      var runningTest = _pool.withResource(() => _runTestsWithTimeout(
+          testRunner, test, _defaultTimeout).then((TestExecutionResult result) {
+        controller.add(result);
+      }));
 
       // Adding the test Future to the list of tests to watch.
-      testRunnerResultFutures.add(stuff);
+      testRunnerResultFutures.add(runningTest);
     }
 
     // When all tests are completed we close the stream.
@@ -83,4 +71,14 @@ class TestRunnerDispatcher {
 
     return controller.stream;
   }
+}
+
+Future<TestExecutionResult> _runTestsWithTimeout(
+    TestRunner runner, TestConfiguration testConfiguration, Duration timeout) {
+  return runner.runTest(testConfiguration).timeout(timeout, onTimeout: () {
+    var testOutput = "The test did not complete in $timeout. It was aborted.";
+
+    return new TestExecutionResult(testConfiguration,
+        success: false, testOutput: testOutput);
+  });
 }
