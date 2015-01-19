@@ -48,3 +48,17 @@ Future<Directory> createTempDir([bool scheduleDelete = true]) {
     return dir;
   });
 }
+
+DateTime _startTime;
+
+void startTimer() {
+  if (_startTime != null) throw 'already started!';
+  _startTime = new DateTime.now();
+}
+
+void endTimer() {
+  if (startTimer == null) throw 'not started!';
+  var delta = new DateTime.now().difference(_startTime);
+  _startTime = null;
+  print(delta);
+}
