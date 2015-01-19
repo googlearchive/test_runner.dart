@@ -105,8 +105,8 @@ void runTests(
             (String path) => path.endsWith(".dart"));
 
     if (oneDartFiles && !allDartFiles) {
-      stderr.writeln(_redPen("\nYou can only specify one Dart project directory "
-          "or a list of test files.\n"));
+      stderr.writeln(_redPen("\nYou can only specify one Dart project "
+          "directory or a list of test files.\n"));
       exit(2);
     } else if (!allDartFiles && projectOrTests.length == 1) {
       projectPath = projectOrTests[0];
@@ -156,114 +156,117 @@ void runTests(
     exit(2);
   }
 
-  _configToListAndLog(testStream, skipBrowserTests).then((List<TestConfiguration> tests) {
+  _configToListAndLog(testStream, skipBrowserTests).then(
+      (List<TestConfiguration> tests) {
 
-      // Error if no tests were found.
-      if (tests == null || tests.length == 0) {
-        if (!Platform.isWindows) {
-          print('\x1b[2A');
-        }
-        stderr.writeln(_redPen("No tests files were found."
-            "                                   \n"));
-        exit(3);
-      }
-
-      _displayTestCount(tests, true, skipBrowserTests, false);
-
-      // Step 3 bis: Check if browser binaries have been set correctly.
-
-      // Count browser tests.
-      List<TestConfiguration> browserTests = tests.where(
-              (TestConfiguration t) => t.testType is BrowserTest).toList();
-
-      // If there are browser tests and we need to run them. Check for browser
-      // binaries.
-      if (browserTests.length > 0 && !skipBrowserTests) {
-        print("\nChecking browser binaries...");
-        try {
-          dartBinaries.checkBrowserBinaries();
-        } catch (e) {
-          stderr.writeln(_redPen("$e"));
-          stderr.writeln(_redPen("You can choose to skip all browser tests by "
-              "using the --skip-browser-tests option and this binary won't be "
-              "needed.\n"));
-          exit(2);
-        }
-        print(_greenPen("Browser binaries OK."));
-      } else if (skipBrowserTests) {
-        // If skipBrowserTests is true we remove all Browser tests.
-        tests.removeWhere((config) => !(config.testType is BrowserTest));
-      }
-
-      // Step 4: Run all tests and catch their output so that we can print it on
-      // the command line.
-
-      print("\nRunning all tests...");
-      TestRunnerDispatcher testRunners =
-          new TestRunnerDispatcher(dartBinaries, dartProject,
-                                   maxProcesses: maxParallelProcesses);
-      testRunners.runTests(tests)
-        ..listen((TestExecutionResult result) {
-          // As soon as each test is finished we display the results.
-          if (verbose) print("");
-          if (result.success) {
-            print(_greenPen("Test suite passed: ${result.test.testFileName}"));
-          } else {
-            print(_redPen("Test suite failed: ${result.test.testFileName}"));
+        // Error if no tests were found.
+        if (tests == null || tests.length == 0) {
+          if (!Platform.isWindows) {
+            print('\x1b[2A');
           }
-          if (verbose || !result.success) {
-            print("Detailed results of test suite "
-                "${result.test.testFileName}:");
-            print(_makeWindowsCompatible("┌───────────────────────────────"
-                  "${result.test.testFileName.replaceAll(
-                      new RegExp(r'.'), '─')}"));
-            if (result.testOutput.trim() != ""
-                || result.testErrorOutput.trim() != "") {
-              print(result.testOutput.trim()
-              .replaceAll("\r", "")
-              .replaceAll(new RegExp(r"^"), _makeWindowsCompatible("│ "))
-              .replaceAll("\n", _makeWindowsCompatible("\n│ ")));
-              if (result.testErrorOutput.trim() != "")
-                print(result.testErrorOutput.trim()
+          stderr.writeln(_redPen("No tests files were found."
+              "                                   \n"));
+          exit(3);
+        }
+
+        _displayTestCount(tests, true, skipBrowserTests, false);
+
+        // Step 3 bis: Check if browser binaries have been set correctly.
+
+        // Count browser tests.
+        List<TestConfiguration> browserTests = tests.where(
+                (TestConfiguration t) => t.testType is BrowserTest).toList();
+
+        // If there are browser tests and we need to run them. Check for browser
+        // binaries.
+        if (browserTests.length > 0 && !skipBrowserTests) {
+          print("\nChecking browser binaries...");
+          try {
+            dartBinaries.checkBrowserBinaries();
+          } catch (e) {
+            stderr.writeln(_redPen("$e"));
+            stderr.writeln(_redPen("You can choose to skip all browser tests "
+                "by using the --skip-browser-tests option and this binary "
+                "won't be needed.\n"));
+            exit(2);
+          }
+          print(_greenPen("Browser binaries OK."));
+        } else if (skipBrowserTests) {
+          // If skipBrowserTests is true we remove all Browser tests.
+          tests.removeWhere((config) => !(config.testType is BrowserTest));
+        }
+
+        // Step 4: Run all tests and catch their output so that we can print it
+        // on the command line.
+
+        print("\nRunning all tests...");
+        TestRunnerDispatcher testRunners =
+            new TestRunnerDispatcher(dartBinaries, dartProject,
+                                     maxProcesses: maxParallelProcesses);
+        testRunners.runTests(tests)
+          ..listen((TestExecutionResult result) {
+            // As soon as each test is finished we display the results.
+            if (verbose) print("");
+            if (result.success) {
+              print(_greenPen("Test suite passed: "
+                 + result.test.testFileName));
+            } else {
+              print(_redPen("Test suite failed: ${result.test.testFileName}"));
+            }
+            if (verbose || !result.success) {
+              print("Detailed results of test suite "
+                  "${result.test.testFileName}:");
+              print(_makeWindowsCompatible("┌───────────────────────────────"
+                    "${result.test.testFileName.replaceAll(
+                        new RegExp(r'.'), '─')}"));
+              if (result.testOutput.trim() != ""
+                  || result.testErrorOutput.trim() != "") {
+                print(result.testOutput.trim()
                 .replaceAll("\r", "")
                 .replaceAll(new RegExp(r"^"), _makeWindowsCompatible("│ "))
                 .replaceAll("\n", _makeWindowsCompatible("\n│ ")));
-            } else {
-              print(_makeWindowsCompatible("│ There was no test output."));
+                if (result.testErrorOutput.trim() != "")
+                  print(result.testErrorOutput.trim()
+                  .replaceAll("\r", "")
+                  .replaceAll(new RegExp(r"^"), _makeWindowsCompatible("│ "))
+                  .replaceAll("\n", _makeWindowsCompatible("\n│ ")));
+              } else {
+                print(_makeWindowsCompatible("│ There was no test output."));
+              }
+              print(_makeWindowsCompatible("└───────────────────────────────"
+              "${result.test.testFileName.replaceAll(
+                  new RegExp(r'.'), '─')}"));
             }
-            print(_makeWindowsCompatible("└───────────────────────────────"
-            "${result.test.testFileName.replaceAll(
-                new RegExp(r'.'), '─')}"));
-          }
-        })
+          })
 
-        // Step 5: Display summary of tests results and cleanup generated files.
+          // Step 5: Display summary of tests results and cleanup generated
+          // files.
 
-        ..toList().then((List<TestExecutionResult> results) {
+          ..toList().then((List<TestExecutionResult> results) {
 
-          // Cleanup generated files.
-          TestRunnerCodeGenerator
-              .deleteGeneratedTestFilesDirectory(dartProject);
+            // Cleanup generated files.
+            TestRunnerCodeGenerator
+                .deleteGeneratedTestFilesDirectory(dartProject);
 
-          // When all te tests are finished we display a summary and exit.
-          List<TestExecutionResult> failedTestResults =
-              results.where((TestExecutionResult t) => !t.success).toList();
-          if (failedTestResults.length == 0) {
-            print(_greenPen("\nSummary: ALL ${results.length} TEST SUITE(S) "
-                "PASSED.\n"));
-            exit(0);
-          } else if (failedTestResults.length == results.length) {
-            print(_redPen("\nSummary: ALL ${failedTestResults.length} "
-               "TEST SUITE(S) FAILED.\n"));
-            exit(1);
-          } else {
-            print("\nSummary: "
-                + _redPen("${failedTestResults.length} TEST SUITE(S) FAILED. ")
-                + _greenPen("${results.length - failedTestResults.length} TEST "
-                    "SUITE(S) PASSED.\n"));
-            exit(1);
-          }
-        });
+            // When all te tests are finished we display a summary and exit.
+            List<TestExecutionResult> failedTestResults =
+                results.where((TestExecutionResult t) => !t.success).toList();
+            if (failedTestResults.length == 0) {
+              print(_greenPen("\nSummary: ALL ${results.length} TEST SUITE(S) "
+                  "PASSED.\n"));
+              exit(0);
+            } else if (failedTestResults.length == results.length) {
+              print(_redPen("\nSummary: ALL ${failedTestResults.length} "
+                 "TEST SUITE(S) FAILED.\n"));
+              exit(1);
+            } else {
+              print("\nSummary: " + _redPen("${failedTestResults.length} "
+                  " TEST SUITE(S) FAILED. ")
+                  + _greenPen("${results.length - failedTestResults.length} "
+                  "TEST SUITE(S) PASSED.\n"));
+              exit(1);
+            }
+          });
   });
 }
 
