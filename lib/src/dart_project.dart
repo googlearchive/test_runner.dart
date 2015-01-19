@@ -60,15 +60,15 @@ class DartProject {
 
     projectPath = projectDirectory.path;
 
-    var pubSpec = new File(path.join(projectPath, 'pubspec.yaml'));
+    var pubSpecFile = new File(path.join(projectPath, 'pubspec.yaml'));
 
-    if (!pubSpec.existsSync()) {
+    if (!pubSpecFile.existsSync()) {
       throw new ArgumentError('"$projectPath" is not a Dart project directory.'
           ' Could not find the "pubspec.yaml" file.');
     }
 
     try {
-      pubSpecYaml = loadYaml(pubSpec.readAsStringSync());
+      pubSpecYaml = loadYaml(pubSpecFile.readAsStringSync());
     } catch(e) {
       throw new ArgumentError('There was an error reading the "pubspec.yaml" '
           'file of the project: $e');
