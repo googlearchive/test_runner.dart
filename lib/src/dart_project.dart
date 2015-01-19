@@ -163,44 +163,39 @@ class DartProject {
   // TODO: add annotation extraction to configure tests.
   Future<TestConfiguration> _extractTestConf(FileSystemEntity file) {
 
-    Completer completer = new Completer();
-
     // Make sure [file] is an actual Dart test file.
-    if (!FileSystemEntity.isFileSync(file.path)
-        || !file.path.endsWith(TEST_FILE_SUFFIX)
-        || file.path.contains(
-            GENERATED_TEST_FILES_DIR_NAME
-                + Platform.pathSeparator)) {
-      completer.complete(null);
-      return completer.future;
+    if (!FileSystemEntity.isFileSync(file.path) ||
+        !file.path.endsWith(TEST_FILE_SUFFIX) ||
+        file.path
+            .contains(GENERATED_TEST_FILES_DIR_NAME + Platform.pathSeparator)) {
+      return new Future.value();
     }
 
     // Checking if there is an associated HTML file in which case this is a
     // Browser Test.
-    String potentialHtmlFilePath = file.path.substring(0, file.path.length - 5)
-        + ".html";
-    if (FileSystemEntity.typeSync(potentialHtmlFilePath)
-        == FileSystemEntityType.FILE) {
+    String potentialHtmlFilePath =
+        file.path.substring(0, file.path.length - 5) + ".html";
+    if (FileSystemEntity.typeSync(potentialHtmlFilePath) ==
+        FileSystemEntityType.FILE) {
       TestConfiguration testConfiguration = new TestConfiguration(
           file.path, this,
           testType: new BrowserTest(htmlFilePath: potentialHtmlFilePath));
-      completer.complete(testConfiguration);
+
+      return new Future.value(testConfiguration);
     } else {
       // We check that the test is a Browser Test using dart2js as it may not
       // have an attached HTML file.
-      dartBinaries.isDartFileBrowserOnly(file.path).then((bool isBrowser) {
+      return dartBinaries.isDartFileBrowserOnly(file.path).then(
+          (bool isBrowser) {
         TestConfiguration testConfiguration;
         if (isBrowser) {
-          testConfiguration = new TestConfiguration(
-              file.path, this,
+          testConfiguration = new TestConfiguration(file.path, this,
               testType: new BrowserTest());
         } else {
           testConfiguration = new TestConfiguration(file.path, this);
         }
-        completer.complete(testConfiguration);
+        return testConfiguration;
       });
     }
-
-    return completer.future;
   }
 }
