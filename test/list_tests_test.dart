@@ -48,6 +48,13 @@ void main() {
       project.checkProject();
     });
 
+    schedule(() {
+      return Process.run('pub', ['get', '--offline'],
+          workingDirectory: project.projectPath).then((pr) {
+        expect(pr.exitCode, 0, reason: 'pub get should succeed');
+      });
+    });
+
     Map<String, TestConfiguration> tests;
 
     schedule(() {
