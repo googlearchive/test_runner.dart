@@ -11,6 +11,11 @@ import 'package:path/path.dart' as path;
 
 /// Holds pointers to Dart SDK binaries and offers convenience methods.
 class DartBinaries {
+  static const CONTEST_SHELL_BIN_NAME = 'content_shell';
+
+  static const PUB_BIN_NAME = 'pub';
+
+  static const DART2JS_BIN_NAME = 'dart2js';
 
   /// Path to the Content Shell executable.
   String contentShellBin;

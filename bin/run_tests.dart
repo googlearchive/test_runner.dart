@@ -47,14 +47,14 @@ void runTests(
                 'current project will be discovered and ran.')
     List<String> projectOrTests,
     {@Option(help: 'Path to the Content Shell executable. If omitted '
-                   '"content_shell" from env is used.')
-    String contentShellBin: "content_shell",
-    @Option(help: 'Path to the Pub executable. If omitted "pub" from env is '
-                  'used.')
-    String pubBin: "pub",
-    @Option(help: 'Path to the dart2js executable. If omitted "dart2js" from '
-                  'env is used.')
-    String dart2jsBin: "dart2js",
+                   '"${DartBinaries.CONTEST_SHELL_BIN_NAME}" from env is used.')
+    String contentShellBin: DartBinaries.CONTEST_SHELL_BIN_NAME,
+    @Option(help: 'Path to the Pub executable. If omitted '
+                  '"${DartBinaries.PUB_BIN_NAME}" from env is used.')
+    String pubBin: DartBinaries.PUB_BIN_NAME,
+    @Option(help: 'Path to the dart2js executable. If omitted '
+                  '${DartBinaries.DART2JS_BIN_NAME} from env is used.')
+    String dart2jsBin: DartBinaries.DART2JS_BIN_NAME,
     @Option(help: 'Maximum number of processes that will run in parallel.'
                   '"auto" will use the number of processors available on the '
                   'machine.')
