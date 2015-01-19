@@ -5,7 +5,9 @@
 library test_runner.test_configuration;
 
 import 'dart:io';
+
 import 'package:path/path.dart' as path;
+
 import 'dart_project.dart';
 
 // The classes below used as annotations to configure test files.
@@ -61,20 +63,6 @@ class VmTest extends Test {
   final bool disableTransformers;
 
   const VmTest({this.disableTransformers: false});
-}
-
-/// Annotate a test main function if the test can't be run in parallel to other.
-/// For example if it uses database read/write conflicting with other tests.
-// TODO need to implement this behavior
-class NotParallelizable {
-  const NotParallelizable();
-}
-
-/// Annotate a test main function if the test is supposed to fail. For example
-/// in the case of Test-driven development.
-// TODO need to implement this behavior
-class ShouldFail {
-  const ShouldFail();
 }
 
 /// Describes a test and its configuration like:

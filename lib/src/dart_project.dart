@@ -6,12 +6,14 @@ library test_runner.dart_project;
 
 import 'dart:async';
 import 'dart:io';
+
 import 'package:path/path.dart' as path;
+import 'package:pool/pool.dart';
 import 'package:yaml/yaml.dart';
+
 import 'dart_binaries.dart';
 import 'test_configuration.dart';
-import 'test_runner.dart';
-import 'package:pool/pool.dart';
+import 'util.dart';
 
 /// Represents a Dart project
 class DartProject {
@@ -30,17 +32,13 @@ class DartProject {
   /// YAML data of the pubspec.yaml file.
   var pubSpecYaml;
 
-  /// List of tests to run.
-  Stream<TestConfiguration> tests;
-
   /// Pool that limits the number of concurrently running tests.
-  Pool pool;
+  final Pool _pool;
 
   /// Constructor. You can specify the maximum number of tests detection
   /// processes that can run in parallel with [maxProcesses].
-  DartProject(this.projectPath, this.dartBinaries, {int maxProcesses: 4}) {
-    pool = new Pool(maxProcesses);
-  }
+  DartProject(this.projectPath, this.dartBinaries, {int maxProcesses: 4})
+      : _pool = new Pool(maxProcesses);
 
   /// Check if a Dart project can be found in [projectPath] and loads its
   /// pubspec.yaml values into [pubSpecYaml].
@@ -95,7 +93,6 @@ class DartProject {
 
     StreamController<TestConfiguration> controller =
         new StreamController.broadcast();
-    tests = controller.stream;
 
     List<Future<TestConfiguration>> testConfFutureList = new List();
 
@@ -112,7 +109,7 @@ class DartProject {
     } on StateError catch(e) {
       // No "test" folder so no tests to run.
       controller.close();
-      return tests;
+      return controller.stream;
     }
 
     // Will list all files to be analyzed.
@@ -147,8 +144,8 @@ class DartProject {
     // Check if the files listed could be a Dart test and extract each test
     // configuration.
     for (FileSystemEntity file in files) {
-      Future<TestConfiguration> testConfFuture = pool.withResource(() =>
-          extractTestConf(file)
+      Future<TestConfiguration> testConfFuture = _pool.withResource(() =>
+          _extractTestConf(file)
               ..then((TestConfiguration testConf) {
                 if (testConf != null) {
                   controller.add(testConf);
@@ -159,13 +156,13 @@ class DartProject {
 
     // Notify the StreamController when all testConfig have been extracted.
     Future.wait(testConfFutureList).then((_) => controller.close());
-    return tests;
+    return controller.stream;
   }
 
   /// Extracts the given test [file]'s configuration. If the [file] is not a
   /// test [null] is returned.
   // TODO: add annotation extraction to configure tests.
-  Future<TestConfiguration> extractTestConf(FileSystemEntity file) {
+  Future<TestConfiguration> _extractTestConf(FileSystemEntity file) {
 
     Completer completer = new Completer();
 
@@ -173,7 +170,7 @@ class DartProject {
     if (!FileSystemEntity.isFileSync(file.path)
         || !file.path.endsWith(TEST_FILE_SUFFIX)
         || file.path.contains(
-            TestRunnerCodeGenerator.GENERATED_TEST_FILES_DIR_NAME
+            GENERATED_TEST_FILES_DIR_NAME
                 + Platform.pathSeparator)) {
       completer.complete(null);
       return completer.future;
