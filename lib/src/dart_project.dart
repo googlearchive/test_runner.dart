@@ -30,7 +30,7 @@ class DartProject {
   Directory testDirectory;
 
   /// YAML data of the pubspec.yaml file.
-  var pubSpecYaml;
+  Map pubSpecYaml;
 
   /// Pool that limits the number of concurrently running tests.
   final Pool _pool;
@@ -44,13 +44,14 @@ class DartProject {
   /// pubspec.yaml values into [pubSpecYaml].
   void checkProject() {
 
-    if (FileSystemEntity.typeSync(projectPath)
-        == FileSystemEntityType.NOT_FOUND) {
+    var projPathType = FileSystemEntity.typeSync(projectPath);
+
+    if (projPathType == FileSystemEntityType.NOT_FOUND) {
       throw new ArgumentError('The "${new File(projectPath).absolute.path}" '
           'directory does not exist.');
     }
 
-    if (!FileSystemEntity.isDirectorySync(projectPath)) {
+    if (projPathType != FileSystemEntityType.DIRECTORY) {
       throw new ArgumentError("\"$projectPath\" is not a directory.");
     }
 
@@ -65,11 +66,9 @@ class DartProject {
       projectPath = projectDirectory.path + "/";
     }
 
-    File pubSpec;
-    try {
-      pubSpec = projectDirectory.listSync().firstWhere(
-          (FileSystemEntity f) => path.basename(f.path) == "pubspec.yaml");
-    } on StateError catch (e) {
+    var pubSpec = new File(path.join(projectPath, 'pubspec.yaml'));
+
+    if (!pubSpec.existsSync()) {
       throw new ArgumentError('"$projectPath" is not a Dart project directory.'
           ' Could not find the "pubspec.yaml" file.');
     }
