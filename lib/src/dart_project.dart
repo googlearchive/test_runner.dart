@@ -7,7 +7,7 @@ library test_runner.dart_project;
 import 'dart:async';
 import 'dart:io';
 
-import 'package:path/path.dart' as path;
+import 'package:path/path.dart' as p;
 import 'package:pool/pool.dart';
 import 'package:yaml/yaml.dart';
 
@@ -17,7 +17,6 @@ import 'util.dart';
 
 /// Represents a Dart project
 class DartProject {
-
   static const String TEST_FILE_SUFFIX = "_test.dart";
 
   /// Pointer to the dart binaries.
@@ -26,8 +25,10 @@ class DartProject {
   /// Path to the root of the Dart project.
   String projectPath;
 
+  Directory _testDirectory;
+
   /// The project's test folder [Directory].
-  Directory testDirectory;
+  Directory get testDirectory => _testDirectory;
 
   /// YAML data of the pubspec.yaml file.
   Map pubSpecYaml;
@@ -43,7 +44,6 @@ class DartProject {
   /// Check if a Dart project can be found in [projectPath] and loads its
   /// pubspec.yaml values into [pubSpecYaml].
   void checkProject() {
-
     var projPathType = FileSystemEntity.typeSync(projectPath);
 
     if (projPathType == FileSystemEntityType.NOT_FOUND) {
@@ -60,7 +60,7 @@ class DartProject {
 
     projectPath = projectDirectory.path;
 
-    var pubSpecFile = new File(path.join(projectPath, 'pubspec.yaml'));
+    var pubSpecFile = new File(p.join(projectPath, 'pubspec.yaml'));
 
     if (!pubSpecFile.existsSync()) {
       throw new ArgumentError('"$projectPath" is not a Dart project directory.'
@@ -69,7 +69,7 @@ class DartProject {
 
     try {
       pubSpecYaml = loadYaml(pubSpecFile.readAsStringSync());
-    } catch(e) {
+    } catch (e) {
       throw new ArgumentError('There was an error reading the "pubspec.yaml" '
           'file of the project: $e');
     }
@@ -83,23 +83,16 @@ class DartProject {
   ///  - Import 'package:unittest/unittest.dart' and have a main() function
   ///  - have a main function annotated with a [BrowserTest] or [VmTest]
   Stream<TestConfiguration> findTests(List<String> testPaths) {
-
     StreamController<TestConfiguration> controller =
         new StreamController.broadcast();
 
-    List<Future<TestConfiguration>> testConfFutureList = new List();
+    var testConfFutureList = new List<Future<TestConfiguration>>();
 
-    // First we find the "test" folder.
-    Directory projectDirectory = new Directory(projectPath);
     try {
-      testDirectory = projectDirectory.listSync().firstWhere(
-          (FileSystemEntity f) {
-            return f.path.endsWith("/test")
-                && FileSystemEntity.isDirectorySync(f.path);
-          });
-      testDirectory =
-          new Directory(testDirectory.absolute.resolveSymbolicLinksSync());
-    } on StateError catch(e) {
+      var testDirPath =
+          new Directory(p.join(projectPath, 'test')).resolveSymbolicLinksSync();
+      _testDirectory = new Directory(testDirPath);
+    } catch (e) {
       // No "test" folder so no tests to run.
       controller.close();
       return controller.stream;
@@ -117,11 +110,11 @@ class DartProject {
               'suffix');
         } else if (FileSystemEntity.isFileSync(testPath)) {
           File testFile = new File(testPath);
-          if (!FileSystemEntity.identicalSync(testFile.parent.path,
-                                              testDirectory.path)) {
+          if (!FileSystemEntity.identicalSync(
+              testFile.parent.path, testDirectory.path)) {
             throw new ArgumentError('The "$testPath" test file is not located'
-                " in the current Dart project's test directory: "
-                + testDirectory.path);
+                " in the current Dart project's test directory: " +
+                testDirectory.path);
           } else {
             files.add(testFile);
           }
@@ -137,12 +130,11 @@ class DartProject {
     // Check if the files listed could be a Dart test and extract each test
     // configuration.
     for (FileSystemEntity file in files) {
-      Future<TestConfiguration> testConfFuture = _pool.withResource(() =>
-          _extractTestConf(file)
-              ..then((TestConfiguration testConf) {
-                if (testConf != null) {
-                  controller.add(testConf);
-                }
+      Future<TestConfiguration> testConfFuture = _pool.withResource(
+          () => _extractTestConf(file).then((TestConfiguration testConf) {
+        if (testConf != null) {
+          controller.add(testConf);
+        }
       }));
       testConfFutureList.add(testConfFuture);
     }
@@ -171,8 +163,7 @@ class DartProject {
         file.path.substring(0, file.path.length - 5) + ".html";
     if (FileSystemEntity.typeSync(potentialHtmlFilePath) ==
         FileSystemEntityType.FILE) {
-      TestConfiguration testConfiguration = new TestConfiguration(
-          file.path, this,
+      var testConfiguration = new TestConfiguration(file.path, this,
           testType: new BrowserTest(htmlFilePath: potentialHtmlFilePath));
 
       return new Future.value(testConfiguration);
@@ -181,14 +172,12 @@ class DartProject {
       // have an attached HTML file.
       return dartBinaries.isDartFileBrowserOnly(file.path).then(
           (bool isBrowser) {
-        TestConfiguration testConfiguration;
         if (isBrowser) {
-          testConfiguration = new TestConfiguration(file.path, this,
+          return new TestConfiguration(file.path, this,
               testType: new BrowserTest());
         } else {
-          testConfiguration = new TestConfiguration(file.path, this);
+          return new TestConfiguration(file.path, this);
         }
-        return testConfiguration;
       });
     }
   }
