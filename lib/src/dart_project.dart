@@ -172,12 +172,12 @@ class DartProject {
       // have an attached HTML file.
       return dartBinaries.isDartFileBrowserOnly(file.path).then(
           (bool isBrowser) {
-        if (isBrowser) {
-          return new TestConfiguration(file.path, this,
-              testType: new BrowserTest());
-        } else {
-          return new TestConfiguration(file.path, this);
-        }
+            if (isBrowser) {
+              return new TestConfiguration(file.path, this,
+                  testType: new BrowserTest());
+            } else {
+              return new TestConfiguration(file.path, this);
+            }
       });
     }
   }
