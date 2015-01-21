@@ -7,7 +7,7 @@ library test_runner.dart_project;
 import 'dart:async';
 import 'dart:io';
 
-import 'package:path/path.dart' as path;
+import 'package:path/path.dart' as p;
 import 'package:pool/pool.dart';
 import 'package:yaml/yaml.dart';
 
@@ -17,7 +17,6 @@ import 'util.dart';
 
 /// Represents a Dart project
 class DartProject {
-
   static const String TEST_FILE_SUFFIX = "_test.dart";
 
   /// Pointer to the dart binaries.
@@ -26,11 +25,13 @@ class DartProject {
   /// Path to the root of the Dart project.
   String projectPath;
 
+  Directory _testDirectory;
+
   /// The project's test folder [Directory].
-  Directory testDirectory;
+  Directory get testDirectory => _testDirectory;
 
   /// YAML data of the pubspec.yaml file.
-  var pubSpecYaml;
+  Map pubSpecYaml;
 
   /// Pool that limits the number of concurrently running tests.
   final Pool _pool;
@@ -43,14 +44,14 @@ class DartProject {
   /// Check if a Dart project can be found in [projectPath] and loads its
   /// pubspec.yaml values into [pubSpecYaml].
   void checkProject() {
+    var projPathType = FileSystemEntity.typeSync(projectPath);
 
-    if (FileSystemEntity.typeSync(projectPath)
-        == FileSystemEntityType.NOT_FOUND) {
+    if (projPathType == FileSystemEntityType.NOT_FOUND) {
       throw new ArgumentError('The "${new File(projectPath).absolute.path}" '
           'directory does not exist.');
     }
 
-    if (!FileSystemEntity.isDirectorySync(projectPath)) {
+    if (projPathType != FileSystemEntityType.DIRECTORY) {
       throw new ArgumentError("\"$projectPath\" is not a directory.");
     }
 
@@ -59,24 +60,16 @@ class DartProject {
 
     projectPath = projectDirectory.path;
 
-    // If the dart project path is a "/test" folder we look up.
-    if (path.basename(projectDirectory.path) == "test") {
-      projectDirectory = projectDirectory.parent;
-      projectPath = projectDirectory.path + "/";
-    }
+    var pubSpecFile = new File(p.join(projectPath, 'pubspec.yaml'));
 
-    File pubSpec;
-    try {
-      pubSpec = projectDirectory.listSync().firstWhere(
-          (FileSystemEntity f) => path.basename(f.path) == "pubspec.yaml");
-    } on StateError catch (e) {
+    if (!pubSpecFile.existsSync()) {
       throw new ArgumentError('"$projectPath" is not a Dart project directory.'
           ' Could not find the "pubspec.yaml" file.');
     }
 
     try {
-      pubSpecYaml = loadYaml(pubSpec.readAsStringSync());
-    } catch(e) {
+      pubSpecYaml = loadYaml(pubSpecFile.readAsStringSync());
+    } catch (e) {
       throw new ArgumentError('There was an error reading the "pubspec.yaml" '
           'file of the project: $e');
     }
@@ -90,23 +83,16 @@ class DartProject {
   ///  - Import 'package:unittest/unittest.dart' and have a main() function
   ///  - have a main function annotated with a [BrowserTest] or [VmTest]
   Stream<TestConfiguration> findTests(List<String> testPaths) {
-
     StreamController<TestConfiguration> controller =
         new StreamController.broadcast();
 
-    List<Future<TestConfiguration>> testConfFutureList = new List();
+    var testConfFutureList = new List<Future<TestConfiguration>>();
 
-    // First we find the "test" folder.
-    Directory projectDirectory = new Directory(projectPath);
     try {
-      testDirectory = projectDirectory.listSync().firstWhere(
-          (FileSystemEntity f) {
-            return f.path.endsWith("/test")
-                && FileSystemEntity.isDirectorySync(f.path);
-          });
-      testDirectory =
-          new Directory(testDirectory.absolute.resolveSymbolicLinksSync());
-    } on StateError catch(e) {
+      var testDirPath =
+          new Directory(p.join(projectPath, 'test')).resolveSymbolicLinksSync();
+      _testDirectory = new Directory(testDirPath);
+    } catch (e) {
       // No "test" folder so no tests to run.
       controller.close();
       return controller.stream;
@@ -124,11 +110,11 @@ class DartProject {
               'suffix');
         } else if (FileSystemEntity.isFileSync(testPath)) {
           File testFile = new File(testPath);
-          if (!FileSystemEntity.identicalSync(testFile.parent.path,
-                                              testDirectory.path)) {
+          if (!FileSystemEntity.identicalSync(
+              testFile.parent.path, testDirectory.path)) {
             throw new ArgumentError('The "$testPath" test file is not located'
-                " in the current Dart project's test directory: "
-                + testDirectory.path);
+                " in the current Dart project's test directory: " +
+                testDirectory.path);
           } else {
             files.add(testFile);
           }
@@ -144,12 +130,11 @@ class DartProject {
     // Check if the files listed could be a Dart test and extract each test
     // configuration.
     for (FileSystemEntity file in files) {
-      Future<TestConfiguration> testConfFuture = _pool.withResource(() =>
-          _extractTestConf(file)
-              ..then((TestConfiguration testConf) {
-                if (testConf != null) {
-                  controller.add(testConf);
-                }
+      Future<TestConfiguration> testConfFuture = _pool.withResource(
+          () => _extractTestConf(file).then((TestConfiguration testConf) {
+        if (testConf != null) {
+          controller.add(testConf);
+        }
       }));
       testConfFutureList.add(testConfFuture);
     }
@@ -164,44 +149,36 @@ class DartProject {
   // TODO: add annotation extraction to configure tests.
   Future<TestConfiguration> _extractTestConf(FileSystemEntity file) {
 
-    Completer completer = new Completer();
-
     // Make sure [file] is an actual Dart test file.
-    if (!FileSystemEntity.isFileSync(file.path)
-        || !file.path.endsWith(TEST_FILE_SUFFIX)
-        || file.path.contains(
-            GENERATED_TEST_FILES_DIR_NAME
-                + Platform.pathSeparator)) {
-      completer.complete(null);
-      return completer.future;
+    if (!FileSystemEntity.isFileSync(file.path) ||
+        !file.path.endsWith(TEST_FILE_SUFFIX) ||
+        file.path
+            .contains(GENERATED_TEST_FILES_DIR_NAME + Platform.pathSeparator)) {
+      return new Future.value();
     }
 
     // Checking if there is an associated HTML file in which case this is a
     // Browser Test.
-    String potentialHtmlFilePath = file.path.substring(0, file.path.length - 5)
-        + ".html";
-    if (FileSystemEntity.typeSync(potentialHtmlFilePath)
-        == FileSystemEntityType.FILE) {
-      TestConfiguration testConfiguration = new TestConfiguration(
-          file.path, this,
+    String potentialHtmlFilePath =
+        file.path.substring(0, file.path.length - 5) + ".html";
+    if (FileSystemEntity.typeSync(potentialHtmlFilePath) ==
+        FileSystemEntityType.FILE) {
+      var testConfiguration = new TestConfiguration(file.path, this,
           testType: new BrowserTest(htmlFilePath: potentialHtmlFilePath));
-      completer.complete(testConfiguration);
+
+      return new Future.value(testConfiguration);
     } else {
       // We check that the test is a Browser Test using dart2js as it may not
       // have an attached HTML file.
-      dartBinaries.isDartFileBrowserOnly(file.path).then((bool isBrowser) {
-        TestConfiguration testConfiguration;
-        if (isBrowser) {
-          testConfiguration = new TestConfiguration(
-              file.path, this,
-              testType: new BrowserTest());
-        } else {
-          testConfiguration = new TestConfiguration(file.path, this);
-        }
-        completer.complete(testConfiguration);
+      return dartBinaries.isDartFileBrowserOnly(file.path).then(
+          (bool isBrowser) {
+            if (isBrowser) {
+              return new TestConfiguration(file.path, this,
+                  testType: new BrowserTest());
+            } else {
+              return new TestConfiguration(file.path, this);
+            }
       });
     }
-
-    return completer.future;
   }
 }
