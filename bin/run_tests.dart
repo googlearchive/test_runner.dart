@@ -284,7 +284,7 @@ void runTests(
               exit(1);
             } else {
               print("\nSummary: " + _redPen("${failedTestResults.length} "
-                  " TEST SUITE(S) FAILED. ")
+                  "TEST SUITE(S) FAILED. ")
                   + _greenPen("${results.length - failedTestResults.length} "
                   "TEST SUITE(S) PASSED.\n"));
               exit(1);
