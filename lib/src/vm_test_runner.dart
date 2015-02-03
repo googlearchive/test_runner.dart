@@ -7,6 +7,8 @@ library test_runner.vm_test_runner;
 import 'dart:async';
 import 'dart:io';
 
+import 'package:path/path.dart' as p;
+
 import 'dart_binaries.dart';
 import 'dart_project.dart';
 import 'test_configuration.dart';
@@ -37,8 +39,8 @@ class VmTestRunner extends TestRunner {
 
     Process.runSync(dartBinaries.pubBin, ["get", "--offline"]);
 
-    String newTestFilePath =
-        "./test/" + GENERATED_TEST_FILES_DIR_NAME + "/" + test.testFileName;
+    String newTestFilePath = p.join(dartProject.testDirectory.path,
+        GENERATED_TEST_FILES_DIR_NAME, test.testFileName);
 
     return Process
         .run(dartBinaries.dartBin, [newTestFilePath],
