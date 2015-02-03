@@ -3,6 +3,12 @@
 This file contains highlights of what changes on each version of the Dart Test
 Runner package.
 
+#### Version 0.2.15 ####
+
+Now using `dart` instead of `pub run` when running VM tests.
+Added the `--dart-bin` command line option to allow setting the `dart`
+executable.
+
 #### Version 0.2.14 ####
 
 Fixed bug where `--skip-browser-tests` was having the opposite effect as

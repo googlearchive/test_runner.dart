@@ -55,6 +55,9 @@ void runTests(
     @Option(help: 'Path to the dart2js executable. If omitted '
                   '${DartBinaries.DART2JS_BIN_NAME} from env is used.')
     String dart2jsBin: DartBinaries.DART2JS_BIN_NAME,
+    @Option(help: 'Path to the dart executable. If omitted '
+                  '${DartBinaries.DART_BIN_NAME} from env is used.')
+    String dartBin: DartBinaries.DART_BIN_NAME,
     @Option(help: 'Maximum number of processes that will run in parallel.'
                   '"auto" will use the number of processors available on the '
                   'machine.')
@@ -131,7 +134,7 @@ void runTests(
   // Step 1: Check if the SDK binaries path have been set correctly.
 
   DartBinaries dartBinaries =
-      new DartBinaries(contentShellBin, pubBin, dart2jsBin);
+      new DartBinaries(contentShellBin, pubBin, dart2jsBin, dartBin);
   print("\nChecking Dart SDK binaries...");
   try {
     dartBinaries.checkDartSdkBinaries();

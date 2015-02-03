@@ -35,11 +35,13 @@ class VmTestRunner extends TestRunner {
         new VmTestRunnerCodeGenerator(dartProject);
     codeGenerator.createTestDartFile(test.testFileName);
 
+    Process.runSync(dartBinaries.pubBin, ["get", "--offline"]);
+
     String newTestFilePath =
         "./test/" + GENERATED_TEST_FILES_DIR_NAME + "/" + test.testFileName;
 
     return Process
-        .run(dartBinaries.pubBin, ["run", newTestFilePath],
+        .run(dartBinaries.dartBin, [newTestFilePath],
             runInShell: false, workingDirectory: dartProject.projectPath)
         .then((ProcessResult testProcess) {
       var success = testProcess.exitCode == 0;

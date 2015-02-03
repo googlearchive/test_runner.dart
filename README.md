@@ -174,6 +174,8 @@ project will be discovered and ran.
 
 `--pub-bin`: Path to the Pub executable. If omitted "pub" from env is used.
 
+`--dart-bin`: Path to the Dart executable. If omitted "dart" from env is used.
+
 `--dart2js-bin`: Path to the dart2js executable. If omitted "dart2js" from env
                  is used.
 
