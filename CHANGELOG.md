@@ -3,6 +3,11 @@
 This file contains highlights of what changes on each version of the Dart Test
 Runner package.
 
+#### Version 0.2.13 ####
+
+Added a `--disable-ansi` option which disables the use of special ANSI
+characters like dynamic line updating and color.
+
 #### Version 0.2.12 ####
 
 Detect if `pub get` has not been ran on the project previously and if not it

@@ -66,11 +66,22 @@ void runTests(
     bool verbose : false,
     @Flag(help: 'Skips all browser tests. Useful when browser binaries like '
                 'content_shell are not available.')
-    bool skipBrowserTests : false}) {
+    bool skipBrowserTests : false,
+    @Flag(help: 'Disables the special ANSI character used in the console '
+                'output for things like dynamic line updating and color. '
+                'This is activated automatically on Windows.')
+    bool disableAnsi : false}) {
+
+
+  // Disable special ANSI characters automatically on Windows.
+
+  if(Platform.isWindows) {
+    disableAnsi = true;
+  }
 
   // Make output pretty and colored if requested.
 
-  if (color && !Platform.isWindows) {
+  if (color && !disableAnsi) {
     _redPen = new AnsiPen()..red(bold: true);
     _greenPen = new AnsiPen()..green(bold: true);
     _orangePen = new AnsiPen()..rgb(r: 1,g: 0.45,b: 0);
@@ -164,12 +175,12 @@ void runTests(
     exit(2);
   }
 
-  _configToListAndLog(testStream, skipBrowserTests).then(
+  _configToListAndLog(testStream, skipBrowserTests, disableAnsi).then(
       (List<TestConfiguration> tests) {
 
         // Error if no tests were found.
         if (tests == null || tests.length == 0) {
-          if (!Platform.isWindows) {
+          if (!disableAnsi) {
             print('\x1b[2A');
           }
           stderr.writeln(_redPen("No tests files were found."
@@ -177,7 +188,7 @@ void runTests(
           exit(3);
         }
 
-        _displayTestCount(tests, true, skipBrowserTests, false);
+        _displayTestCount(tests, true, skipBrowserTests, false, disableAnsi);
 
         // Step 3 bis: Check if browser binaries have been set correctly.
 
@@ -279,31 +290,33 @@ void runTests(
 }
 
 Future<List<TestConfiguration>> _configToListAndLog(
-    Stream<TestConfiguration> testStream, bool skipBrowserTests) {
+    Stream<TestConfiguration> testStream, bool skipBrowserTests, disableAnsi) {
 
   List<TestConfiguration> partialListOfTests = new List();
 
   // Initialise the display of the test detection process
-  _displayTestCount(partialListOfTests, false, skipBrowserTests, true);
+  _displayTestCount(partialListOfTests, false, skipBrowserTests, true,
+      disableAnsi);
 
   return testStream.forEach((conf) {
     partialListOfTests.add(conf);
-    _displayTestCount(partialListOfTests, true, skipBrowserTests, true);
+    _displayTestCount(partialListOfTests, true, skipBrowserTests, true,
+        disableAnsi);
   }).then((_) => partialListOfTests);
 }
 
 /// Displays the information about [tests] found.
 void _displayTestCount(List<TestConfiguration> tests, bool erasePreviousLines,
-                      bool skipBrowserTests, bool partial) {
-  if (erasePreviousLines && !Platform.isWindows) {
+                      bool skipBrowserTests, bool partial, bool disableAnsi) {
+  if (erasePreviousLines && !disableAnsi) {
     print('\x1b[3A');
   }
 
-  // In the case of Windows we just display a dot to show progress.
-  if (partial && Platform.isWindows) {
+  // In the case of non ANSI output we just display a dot to show progress.
+  if (partial && disableAnsi) {
     stdout.write(".");
   } else {
-    stdout.write("\r\n\r");
+    stdout.write("\r\n");
     // Find out how many tests are browser tests.
     List<TestConfiguration> browserTests = tests.where(
             (TestConfiguration t) => t.testType is BrowserTest).toList();
@@ -315,7 +328,7 @@ void _displayTestCount(List<TestConfiguration> tests, bool erasePreviousLines,
 
     if (browserTests.length > 0 && skipBrowserTests) {
       print(_orangePen("Dartium tests will be skipped!"));
-      if (partial && !Platform.isWindows) {
+      if (partial && !disableAnsi) {
         print('\x1b[3A');
       }
     }
