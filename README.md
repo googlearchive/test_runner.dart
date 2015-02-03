@@ -170,7 +170,7 @@ project will be discovered and ran.
 ### Options
 
 `--content-shell-bin`: Path to the Content Shell executable. If omitted
-"content_shell" from env is used.
+                       "content_shell" from env is used.
 
 `--pub-bin`: Path to the Pub executable. If omitted "pub" from env is used.
 
