@@ -159,7 +159,11 @@ void runTests(
   if (!dartProject.packagesFolderExists) {
     stdout.writeln(
         _orangePen("The packages folder does not exists. Running pub get."));
-    Process.runSync(dartBinaries.pubBin, ["get"]);
+    ProcessResult result = Process.runSync(dartBinaries.pubBin, ["get"]);
+    if (result.exitCode != 0) {
+      stderr.writeln(_redPen("Pub get has failed: ${result.stderr}\n"));
+      exit(2);
+    }
   }
 
   // Step 3: Detect all unit tests and extract their configuration.
