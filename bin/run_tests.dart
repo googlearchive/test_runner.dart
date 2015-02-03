@@ -212,7 +212,7 @@ void runTests(
           print(_greenPen("Browser binaries OK."));
         } else if (skipBrowserTests) {
           // If skipBrowserTests is true we remove all Browser tests.
-          tests.removeWhere((config) => !(config.testType is BrowserTest));
+          tests.removeWhere((config) => config.testType is BrowserTest);
         }
 
         // Step 4: Run all tests and catch their output so that we can print it
