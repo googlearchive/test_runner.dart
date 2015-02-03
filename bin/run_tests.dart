@@ -327,9 +327,11 @@ void _displayTestCount(List<TestConfiguration> tests, bool erasePreviousLines,
     + (partial ? ".." : "  ")));
 
     if (browserTests.length > 0 && skipBrowserTests) {
-      print(_orangePen("Dartium tests will be skipped!"));
+      if ((partial && !disableAnsi) || !partial) {
+        print(_orangePen("Dartium tests will be skipped!"));
+      }
       if (partial && !disableAnsi) {
-        print('\x1b[3A');
+        print('\x1b[2A');
       }
     }
   }

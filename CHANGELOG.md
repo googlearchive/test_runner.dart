@@ -5,8 +5,8 @@ Runner package.
 
 #### Version 0.2.14 ####
 
-Fixed bug where `--skip-browser-test` was having the opposite effect as
-intended.
+Fixed bug where `--skip-browser-tests` was having the opposite effect as
+intended. Also fixed a display bug with `--skip-browser-tests`.
 
 #### Version 0.2.13 ####
 
