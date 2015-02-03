@@ -184,6 +184,10 @@ project will be discovered and ran.
                    Defaults to "auto" which depends on the number of processors
                    available.
 
+`--disable-ansi`: Disables the special ANSI character used in the console
+                  output for things like dynamic line updating and color. This
+                  is activated automatically on Windows.
+
 `-c` or `--color`: Prints the output in color in a shell.
 
 `-v` or `--verbose`: Prints all tests results instead of just the summary.
