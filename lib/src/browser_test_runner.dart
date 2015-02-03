@@ -59,32 +59,47 @@ class BrowserTestRunner extends TestRunner {
 
       String testUrl = _buildBrowserTestUrl(test.testFileName);
 
-      Process
-          .run(dartBinaries.contentShellBin,
-              ["--args", "--dump-render-tree",
-               "--disable-gpu", testUrl], runInShell: false)
-          .then((ProcessResult testProcessResult) {
-        if (testProcessResult.stdout.contains("#CRASHED")) {
-          throw new Exception("Error: Content shell crashed.");
-        }
-        var success = testProcessResult.stdout.contains("PASS\n");
-        var testOutput = testProcessResult.stdout
-            .replaceAll("unittest-suite-wait-for-done", "")
-            .replaceAll("#EOF", "")
-            .replaceAll("#READY", "")
-            .replaceAll("CONSOLE MESSAGE: Warning: The "
-                "unittestConfiguration has already been set. New "
-                "unittestConfiguration ignored.", "").replaceAll(
-                "Content-Type: text/plain", "");
-        var testErrorOutput = testProcessResult.stderr
-            .replaceAll("#EOF", "");
+      String testOutput = "";
+      String testErrorOutput = "";
 
-        TestExecutionResult result = new TestExecutionResult(test,
-            success: success,
-            testOutput: testOutput,
-            testErrorOutput: testErrorOutput);
+      Process.start(dartBinaries.contentShellBin,
+                ["--args", "--dump-render-tree",
+                 "--disable-gpu", testUrl], runInShell: false)
+             .then((Process testProcessResult) {
 
-        completer.complete(result);
+        var success = false;
+
+        testProcessResult.stdout.transform(new Utf8Decoder())
+        .transform(new LineSplitter())
+        .listen((String line) {
+          if (line == "#CRASHED") {
+            throw new Exception("Error: Content shell crashed.");
+          } else  if (line == "PASS"){
+            testOutput = "$testOutput\n$line";
+            success = true;
+          } else if (line == "#EOF") {
+            TestExecutionResult result = new TestExecutionResult(test,
+                success: success,
+                testOutput: testOutput,
+                testErrorOutput: testErrorOutput);
+            completer.complete(result);
+            testProcessResult.kill();
+          } else if (line != "CONSOLE MESSAGE: Warning: The "
+              "unittestConfiguration has already been set. New "
+              "unittestConfiguration ignored."
+              && line != "Content-Type: text/plain"
+              && line != "#READY"
+              && line != "unittest-suite-wait-for-done") {
+            testOutput = "$testOutput\n$line";
+          }
+        });
+
+
+        testProcessResult.stderr.transform(new Utf8Decoder())
+            .transform(new LineSplitter())
+            .listen(
+                (String line) => testErrorOutput == "$testErrorOutput\n$line");
+
       });
 
       // TODO: enable code coverage data gathering when
@@ -92,6 +107,8 @@ class BrowserTestRunner extends TestRunner {
       // import 'coverage.dart'
       //startCodeCoverageListener();
     });
+
+
 
     return completer.future;
   }
