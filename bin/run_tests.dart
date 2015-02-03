@@ -11,6 +11,7 @@ import 'package:ansicolor/ansicolor.dart';
 import 'package:unscripted/unscripted.dart';
 
 import 'package:test_runner/test_runner.dart';
+import 'package:test_runner/src/util.dart';
 
 /// Entry point which simply calls [runTests] with the command line arguments.
 void main(List<String> arguments) => declare(runTests).execute(arguments);
@@ -73,7 +74,12 @@ void runTests(
     @Flag(help: 'Disables the special ANSI character used in the console '
                 'output for things like dynamic line updating and color. '
                 'This is activated automatically on Windows.')
-    bool disableAnsi : false}) {
+    bool disableAnsi : false,
+    @Flag(help: 'This is for debugging purposes. The temporary files created '
+                'by the test runner won\'t be deleted when the test runner '
+                'finishes. Temporary files are created under '
+                'test/$GENERATED_TEST_FILES_DIR_NAME')
+    bool keepTemporaryFiles : false}) {
 
 
   // Disable special ANSI characters automatically on Windows.
@@ -270,9 +276,11 @@ void runTests(
 
           ..toList().then((List<TestExecutionResult> results) {
 
-            // Cleanup generated files.
-            TestRunnerCodeGenerator
-                .deleteGeneratedTestFilesDirectory(dartProject);
+            if (!keepTemporaryFiles) {
+              // Cleanup generated files.
+              TestRunnerCodeGenerator
+                  .deleteGeneratedTestFilesDirectory(dartProject);
+            }
 
             // When all te tests are finished we display a summary and exit.
             List<TestExecutionResult> failedTestResults =
