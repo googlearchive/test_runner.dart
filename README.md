@@ -184,7 +184,7 @@ project will be discovered and ran.
 
 `--max-processes`: Maximum number of processes that will run in parallel.
                    Defaults to "auto" which depends on the number of processors
-                   available.
+                   available. Otherwise an integer is expected.
 
 `--disable-ansi`: Disables the special ANSI character used in the console
                   output for things like dynamic line updating and color. This

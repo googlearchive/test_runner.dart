@@ -58,9 +58,9 @@ void runTests(
     @Option(help: 'Path to the dart executable. If omitted '
                   '${DartBinaries.DART_BIN_NAME} from env is used.')
     String dartBin: DartBinaries.DART_BIN_NAME,
-    @Option(help: 'Maximum number of processes that will run in parallel.'
+    @Option(help: 'Maximum number of processes that will run in parallel. '
                   '"auto" will use the number of processors available on the '
-                  'machine.')
+                  'machine. Otherwise an integer is expected.')
     String maxProcesses: "auto",
     @Flag(abbr: 'c', help: 'Prints the output in color in a shell.')
     bool color : false,
