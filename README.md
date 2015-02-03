@@ -39,9 +39,10 @@ Here is an example of output from the Dart test runner:
     Found project "test-runner".
 
     Looking for test suites...
-    Found 5 test suites:
-     - 3 Standalone VM
-     - 2 Dartium
+    Found 5 test suites (3 Standalone VM, 2 Dartium).
+
+    Checking browser binaries...
+    Browser binaries OK.
 
     Running all tests...
     Test suite passed: /vm_ok_test.dart
