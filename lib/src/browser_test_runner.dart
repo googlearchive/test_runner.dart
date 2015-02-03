@@ -77,7 +77,7 @@ class BrowserTestRunner extends TestRunner {
               } else  if (line == "PASS"){
                 testOutput = "$testOutput\n$line";
                 success = true;
-              } else if (line == "#EOF") {
+              } else if (line == "#EOF" && !completer.isCompleted) {
                 TestExecutionResult result = new TestExecutionResult(test,
                     success: success,
                     testOutput: testOutput,
@@ -89,6 +89,7 @@ class BrowserTestRunner extends TestRunner {
                   "unittestConfiguration ignored."
                   && line != "Content-Type: text/plain"
                   && line != "#READY"
+                  && line != "#EOF"
                   && line != "unittest-suite-wait-for-done") {
                 testOutput = "$testOutput\n$line";
               }
