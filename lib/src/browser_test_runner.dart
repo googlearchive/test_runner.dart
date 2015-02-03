@@ -70,28 +70,28 @@ class BrowserTestRunner extends TestRunner {
         var success = false;
 
         testProcessResult.stdout.transform(new Utf8Decoder())
-        .transform(new LineSplitter())
-        .listen((String line) {
-          if (line == "#CRASHED") {
-            throw new Exception("Error: Content shell crashed.");
-          } else  if (line == "PASS"){
-            testOutput = "$testOutput\n$line";
-            success = true;
-          } else if (line == "#EOF") {
-            TestExecutionResult result = new TestExecutionResult(test,
-                success: success,
-                testOutput: testOutput,
-                testErrorOutput: testErrorOutput);
-            completer.complete(result);
-            testProcessResult.kill();
-          } else if (line != "CONSOLE MESSAGE: Warning: The "
-              "unittestConfiguration has already been set. New "
-              "unittestConfiguration ignored."
-              && line != "Content-Type: text/plain"
-              && line != "#READY"
-              && line != "unittest-suite-wait-for-done") {
-            testOutput = "$testOutput\n$line";
-          }
+            .transform(new LineSplitter())
+            .listen((String line) {
+              if (line == "#CRASHED") {
+                throw new Exception("Error: Content shell crashed.");
+              } else  if (line == "PASS"){
+                testOutput = "$testOutput\n$line";
+                success = true;
+              } else if (line == "#EOF") {
+                TestExecutionResult result = new TestExecutionResult(test,
+                    success: success,
+                    testOutput: testOutput,
+                    testErrorOutput: testErrorOutput);
+                completer.complete(result);
+                testProcessResult.kill();
+              } else if (line != "CONSOLE MESSAGE: Warning: The "
+                  "unittestConfiguration has already been set. New "
+                  "unittestConfiguration ignored."
+                  && line != "Content-Type: text/plain"
+                  && line != "#READY"
+                  && line != "unittest-suite-wait-for-done") {
+                testOutput = "$testOutput\n$line";
+              }
         });
 
 
