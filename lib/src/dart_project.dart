@@ -33,6 +33,9 @@ class DartProject {
   /// YAML data of the pubspec.yaml file.
   Map pubSpecYaml;
 
+  /// True if the `packages` folder exists.
+  bool packagesFolderExists;
+
   /// Pool that limits the number of concurrently running tests.
   final Pool _pool;
 
@@ -73,6 +76,10 @@ class DartProject {
       throw new ArgumentError('There was an error reading the "pubspec.yaml" '
           'file of the project: $e');
     }
+
+    // Check if the `packages` folder exists.
+    packagesFolderExists = FileSystemEntity.typeSync(
+        p.join(projectPath, 'packages')) == FileSystemEntityType.DIRECTORY;
   }
 
   /// Finds all the tests in the project and reads their configuration and lists

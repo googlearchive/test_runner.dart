@@ -143,6 +143,14 @@ void runTests(
   }
   print(_greenPen("Found project \"${dartProject.pubSpecYaml["name"]}\"."));
 
+  // Step 2 bis: Run `pub get` if it has not been ran on the project.
+
+  if (!dartProject.packagesFolderExists) {
+    stdout.writeln(
+        _orangePen("The packages folder does not exists. Running pub get."));
+    Process.runSync(dartBinaries.pubBin, ["get"]);
+  }
+
   // Step 3: Detect all unit tests and extract their configuration.
 
   stdout.write("\nLooking for test suites...");
