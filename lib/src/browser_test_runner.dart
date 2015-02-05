@@ -135,19 +135,39 @@ class BrowserTestRunner extends TestRunner {
     pubServerCompleter = new Completer();
     _pubServerCompleters[dartProject.testDirectory.path] = pubServerCompleter;
 
+    String logs = "";
+
     Process.start(dartBinaries.pubBin,
                   ["serve", "test", "--port", "$_WEB_SERVER_PORT"],
                   workingDirectory: dartProject.projectPath).then(
         (Process process) {
+
+          // Log stdout and detect when pub serve is ready.
           process.stdout.transform(new Utf8Decoder())
                         .transform(new LineSplitter())
                         .listen(
               (String line) {
+                logs = "$logs$line\n";
                 if (line.contains("Build completed")
                     && !pubServerCompleter.isCompleted) {
                   pubServerCompleter.complete();
                 }
               });
+
+          // Log stderr.
+          process.stderr.transform(new Utf8Decoder())
+                        .transform(new LineSplitter())
+                        .listen(
+              (String line) {
+            logs = "$logs$line\n";
+          });
+
+          // Detect errors/ crash of pub run.
+          process.exitCode.then((exitCode) {
+            if (exitCode > 0) {
+              throw new Exception("Pub serve has exited before being ready:\n$logs");
+            }
+          });
         });
 
     return pubServerCompleter.future;
