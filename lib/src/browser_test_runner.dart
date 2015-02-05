@@ -61,15 +61,23 @@ class BrowserTestRunner extends TestRunner {
 
       String testOutput = "";
       String testErrorOutput = "";
+      var success = false;
+      var complete = () {
+        if (!completer.isCompleted) {
+          TestExecutionResult result = new TestExecutionResult(test,
+          success: success,
+          testOutput: testOutput,
+          testErrorOutput: testErrorOutput);
+          completer.complete(result);
+        }
+      };
 
       Process.start(dartBinaries.contentShellBin,
                 ["--args", "--dump-render-tree",
                  "--disable-gpu", testUrl], runInShell: false)
-             .then((Process testProcessResult) {
+             .then((Process testProcess) {
 
-        var success = false;
-
-        testProcessResult.stdout.transform(new Utf8Decoder())
+        testProcess.stdout.transform(new Utf8Decoder())
             .transform(new LineSplitter())
             .listen((String line) {
               if (line == "#CRASHED") {
@@ -77,13 +85,9 @@ class BrowserTestRunner extends TestRunner {
               } else  if (line == "PASS"){
                 testOutput = "$testOutput\n$line";
                 success = true;
-              } else if (line == "#EOF" && !completer.isCompleted) {
-                TestExecutionResult result = new TestExecutionResult(test,
-                    success: success,
-                    testOutput: testOutput,
-                    testErrorOutput: testErrorOutput);
-                completer.complete(result);
-                testProcessResult.kill();
+              } else if (line == "#EOF") {
+                complete();
+                testProcess.kill();
               } else if (line != "CONSOLE MESSAGE: Warning: The "
                   "unittestConfiguration has already been set. New "
                   "unittestConfiguration ignored."
@@ -95,18 +99,18 @@ class BrowserTestRunner extends TestRunner {
               }
         });
 
-
-        testProcessResult.stderr.transform(new Utf8Decoder())
+        testProcess.stderr.transform(new Utf8Decoder())
             .transform(new LineSplitter())
             .listen(
                 (String line) => testErrorOutput == "$testErrorOutput\n$line");
+
+        testProcess.exitCode.then((_) => complete());
 
       });
 
       // TODO: enable code coverage data gathering when
       //       https://code.google.com/p/dart/issues/detail?id=20293 is fixed.
       // import 'coverage.dart'
-      //startCodeCoverageListener();
     });
 
 
