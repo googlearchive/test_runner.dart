@@ -102,7 +102,7 @@ class BrowserTestRunner extends TestRunner {
         testProcess.stderr.transform(new Utf8Decoder())
             .transform(new LineSplitter())
             .listen(
-                (String line) => testErrorOutput == "$testErrorOutput\n$line");
+                (String line) => testErrorOutput = "$testErrorOutput\n$line");
 
         testProcess.exitCode.then((_) => complete());
 
