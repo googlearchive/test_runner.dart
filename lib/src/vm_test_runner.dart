@@ -35,26 +35,27 @@ class VmTestRunner extends TestRunner {
     // Generate the file that will force the [VmTestConfiguration] for unittest.
     VmTestRunnerCodeGenerator codeGenerator =
         new VmTestRunnerCodeGenerator(dartProject);
-    codeGenerator.createTestDartFile(test.testFileName);
+    return codeGenerator.createTestDartFile(test.testFileName).then((_) {
 
-    Process.runSync(dartBinaries.pubBin, ["get", "--offline"]);
+      Process.runSync(dartBinaries.pubBin, ["get", "--offline"]);
 
-    String newTestFilePath = p.join(dartProject.testDirectory.path,
-        GENERATED_TEST_FILES_DIR_NAME, test.testFileName);
+      String newTestFilePath = p.join(dartProject.testDirectory.path,
+          GENERATED_TEST_FILES_DIR_NAME, test.testFileName);
 
-    return Process
-        .run(dartBinaries.dartBin, [newTestFilePath],
-            runInShell: false, workingDirectory: dartProject.projectPath)
-        .then((ProcessResult testProcess) {
-      var success = testProcess.exitCode == 0;
-      var testOutput =
-          testProcess.stdout.replaceAll("unittest-suite-wait-for-done", "");
-      var testErrorOutput = testProcess.stderr;
+      return Process
+          .run(dartBinaries.dartBin, [newTestFilePath],
+              runInShell: false, workingDirectory: dartProject.projectPath)
+          .then((ProcessResult testProcess) {
+        var success = testProcess.exitCode == 0;
+        var testOutput =
+        testProcess.stdout.replaceAll("unittest-suite-wait-for-done", "");
+        var testErrorOutput = testProcess.stderr;
 
-      return new TestExecutionResult(test,
-          success: success,
-          testOutput: testOutput,
-          testErrorOutput: testErrorOutput);
+        return new TestExecutionResult(test,
+        success: success,
+        testOutput: testOutput,
+        testErrorOutput: testErrorOutput);
+      });
     });
   }
 }
