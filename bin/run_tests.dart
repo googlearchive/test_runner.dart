@@ -12,6 +12,7 @@ import 'package:unscripted/unscripted.dart';
 
 import 'package:test_runner/test_runner.dart';
 import 'package:test_runner/src/util.dart';
+import 'package:test_runner/src/browser_test_runner.dart';
 
 /// Entry point which simply calls [runTests] with the command line arguments.
 void main(List<String> arguments) => declare(runTests).execute(arguments);
@@ -232,76 +233,104 @@ void runTests(
         // on the command line.
 
         print("\nRunning all tests...");
-        TestRunnerDispatcher testRunners =
-            new TestRunnerDispatcher(dartBinaries, dartProject,
-                                     maxProcesses: maxParallelProcesses);
-        testRunners.runTests(tests)
-          ..listen((TestExecutionResult result) {
-            // As soon as each test is finished we display the results.
-            if (verbose) print("");
-            if (result.success) {
-              print(_greenPen("Test suite passed: "
-                 + result.test.testFileName));
-            } else {
-              print(_redPen("Test suite failed: ${result.test.testFileName}"));
-            }
-            if (verbose || !result.success) {
-              print("Detailed results of test suite "
-                  "${result.test.testFileName}:");
-              print(_makeWindowsCompatible("┌───────────────────────────────"
-                    "${result.test.testFileName.replaceAll(
-                        new RegExp(r'.'), '─')}"));
-              if (result.testOutput.trim() != ""
-                  || result.testErrorOutput.trim() != "") {
-                print(result.testOutput.trim()
+
+        // If there are Browser tests we make sure the HTTP Server is started
+        // before the VM tests are ran.
+        // This is done because there are some potential conflicts with the `pub
+        // get` ran by VM tests.
+        if(browserTests.length > 0) {
+          new BrowserTestRunner(dartBinaries, dartProject).startHttpServer()
+              .then((_) {
+                _runTestsAndDisplayResults(dartBinaries, dartProject,
+                    maxParallelProcesses, tests, verbose, keepTemporaryFiles);
+              });
+        } else {
+          _runTestsAndDisplayResults(dartBinaries, dartProject,
+              maxParallelProcesses, tests, verbose, keepTemporaryFiles);
+        }
+  });
+}
+
+/// Run all the tests and display their results.
+void _runTestsAndDisplayResults(dartBinaries, dartProject, maxParallelProcesses,
+                               tests, verbose, keepTemporaryFiles) {
+
+  TestRunnerDispatcher testRunners =
+  new TestRunnerDispatcher(dartBinaries, dartProject,
+  maxProcesses: maxParallelProcesses);
+  testRunners.runTests(tests)
+    ..listen((TestExecutionResult result) {
+      // As soon as each test is finished we display the results.
+      if (verbose) print("");
+      if (result.success) {
+        print(_greenPen("Test suite passed: "
+        + result.test.testFileName));
+      } else {
+        print(_redPen("Test suite failed: ${result.test.testFileName}"));
+      }
+      if (verbose || !result.success) {
+        print("Detailed results of test suite "
+              "${result.test.testFileName}:");
+        print(_makeWindowsCompatible("┌───────────────────────────────"
+                                     "${result.test.testFileName.replaceAll(
+                                         new RegExp(r'.'), '─')}"));
+
+        if (result.testOutput.trim() != ""
+            || result.testErrorOutput.trim() != "") {
+          print(result.testOutput.trim()
+              .replaceAll("\r", "")
+              .replaceAll(new RegExp(r"^"), _makeWindowsCompatible("│ "))
+              .replaceAll("\n", _makeWindowsCompatible("\n│ ")));
+          if (result.testErrorOutput.trim() != "")
+            print(result.testErrorOutput.trim()
                 .replaceAll("\r", "")
                 .replaceAll(new RegExp(r"^"), _makeWindowsCompatible("│ "))
                 .replaceAll("\n", _makeWindowsCompatible("\n│ ")));
-                if (result.testErrorOutput.trim() != "")
-                  print(result.testErrorOutput.trim()
-                  .replaceAll("\r", "")
-                  .replaceAll(new RegExp(r"^"), _makeWindowsCompatible("│ "))
-                  .replaceAll("\n", _makeWindowsCompatible("\n│ ")));
-              } else {
-                print(_makeWindowsCompatible("│ There was no test output."));
-              }
-              print(_makeWindowsCompatible("└───────────────────────────────"
-              "${result.test.testFileName.replaceAll(
-                  new RegExp(r'.'), '─')}"));
-            }
-          })
+        } else {
+          print(_makeWindowsCompatible("│ There was no test output."));
+        }
+        print(_makeWindowsCompatible("└───────────────────────────────"
+                                     "${result.test.testFileName.replaceAll(
+                                         new RegExp(r'.'), '─')}"));
+      }
+    })
 
-          // Step 5: Display summary of tests results and cleanup generated
-          // files.
+    // Step 5: Display summary of tests results and cleanup generated
+    // files.
 
-          ..toList().then((List<TestExecutionResult> results) {
+    ..toList().then((List<TestExecutionResult> results) {
 
-            if (!keepTemporaryFiles) {
-              // Cleanup generated files.
-              TestRunnerCodeGenerator
-                  .deleteGeneratedTestFilesDirectory(dartProject);
-            }
+      if (!keepTemporaryFiles) {
+        // Cleanup generated files.
+        TestRunnerCodeGenerator
+            .deleteGeneratedTestFilesDirectory(dartProject);
+      }
 
-            // When all te tests are finished we display a summary and exit.
-            List<TestExecutionResult> failedTestResults =
-                results.where((TestExecutionResult t) => !t.success).toList();
-            if (failedTestResults.length == 0) {
-              print(_greenPen("\nSummary: ALL ${results.length} TEST SUITE(S) "
-                  "PASSED.\n"));
-              exit(0);
-            } else if (failedTestResults.length == results.length) {
-              print(_redPen("\nSummary: ALL ${failedTestResults.length} "
-                 "TEST SUITE(S) FAILED.\n"));
-              exit(1);
-            } else {
-              print("\nSummary: " + _redPen("${failedTestResults.length} "
-                  "TEST SUITE(S) FAILED. ")
-                  + _greenPen("${results.length - failedTestResults.length} "
-                  "TEST SUITE(S) PASSED.\n"));
-              exit(1);
-            }
-          });
-  });
+      // Eventually stop the `pub serve`.
+      if (BrowserTestRunner.pubServer != null) {
+        BrowserTestRunner.pubServer.then((Process process)
+            => process.kill());
+      }
+
+      // When all te tests are finished we display a summary and exit.
+      List<TestExecutionResult> failedTestResults =
+      results.where((TestExecutionResult t) => !t.success).toList();
+      if (failedTestResults.length == 0) {
+        print(_greenPen("\nSummary: ALL ${results.length} TEST SUITE(S) "
+              "PASSED.\n"));
+        exit(0);
+      } else if (failedTestResults.length == results.length) {
+        print(_redPen("\nSummary: ALL ${failedTestResults.length} "
+              "TEST SUITE(S) FAILED.\n"));
+        exit(1);
+      } else {
+        print("\nSummary: " + _redPen("${failedTestResults.length} "
+              "TEST SUITE(S) FAILED. ")
+              + _greenPen("${results.length - failedTestResults.length} "
+              "TEST SUITE(S) PASSED.\n"));
+        exit(1);
+      }
+    });
 }
 
 Future<List<TestConfiguration>> _configToListAndLog(

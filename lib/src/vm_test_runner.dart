@@ -52,9 +52,9 @@ class VmTestRunner extends TestRunner {
         var testErrorOutput = testProcess.stderr;
 
         return new TestExecutionResult(test,
-        success: success,
-        testOutput: testOutput,
-        testErrorOutput: testErrorOutput);
+            success: success,
+            testOutput: testOutput,
+            testErrorOutput: testErrorOutput);
       });
     });
   }

@@ -26,9 +26,8 @@ class BrowserTestRunner extends TestRunner {
   /// Host to be used by the [WebServer] serving the test files.
   static const String _WEB_SERVER_HOST = "127.0.0.1";
 
-  /// Points to the [Completer]s that will indicate if pub serve is ready for a
-  /// given project absolute path.
-  static final Map<String, Completer> _pubServerCompleters = new Map();
+  /// Points to the pub server [Process].
+  static Future<Process> pubServer;
 
   /// Pointers to all Dart SDK binaries.
   final DartBinaries dartBinaries;
@@ -51,7 +50,7 @@ class BrowserTestRunner extends TestRunner {
     Future dartFileFuture = codeGenerator.createTestDartFile(test.testFileName);
 
     // Start the Web Server and run the test.
-    Future httpServer = _startHttpServer();
+    Future httpServer = startHttpServer();
 
     // Runs the Web Test in Content Shell when the files have been created and
     // when all the test files have been generated.
@@ -120,20 +119,17 @@ class BrowserTestRunner extends TestRunner {
 
   /// Starts the HTTP server (pub serve in our case) that's serving the test
   /// files. The Future completes when pub serve is ready to serve files.
-  Future _startHttpServer() {
+  Future<Process> startHttpServer() {
 
     // Check if there is already pub serve running (or being started) for this
     // project.
-    Completer pubServerCompleter =
-        _pubServerCompleters[dartProject.testDirectory.path];
-
-    if (pubServerCompleter != null) {
-      return pubServerCompleter.future;
+    if (pubServer != null) {
+      return pubServer;
     }
 
     // Start pub serve to serve the test directory of the project.
-    pubServerCompleter = new Completer();
-    _pubServerCompleters[dartProject.testDirectory.path] = pubServerCompleter;
+    var pubServerCompleter = new Completer<Process>();
+    pubServer = pubServerCompleter.future;
 
     String logs = "";
 
@@ -141,7 +137,6 @@ class BrowserTestRunner extends TestRunner {
                   ["serve", "test", "--port", "$_WEB_SERVER_PORT"],
                   workingDirectory: dartProject.projectPath).then(
         (Process process) {
-
           // Log stdout and detect when pub serve is ready.
           process.stdout.transform(new Utf8Decoder())
                         .transform(new LineSplitter())
@@ -150,7 +145,7 @@ class BrowserTestRunner extends TestRunner {
                 logs = "$logs$line\n";
                 if (line.contains("Build completed")
                     && !pubServerCompleter.isCompleted) {
-                  pubServerCompleter.complete();
+                  pubServerCompleter.complete(process);
                 }
               });
 
@@ -170,7 +165,7 @@ class BrowserTestRunner extends TestRunner {
           });
         });
 
-    return pubServerCompleter.future;
+    return pubServer;
   }
 
   /// Returns the URL that will run the given browser test file.
