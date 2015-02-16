@@ -7,6 +7,7 @@ library test_runner.browser_test_runner;
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'dart_binaries.dart';
 import 'dart_project.dart';
@@ -20,8 +21,7 @@ import 'util.dart';
 class BrowserTestRunner extends TestRunner {
 
   /// Port to be used by the [WebServer] serving the test files.
-  // TODO: randomize port if already used.
-  static const int _WEB_SERVER_PORT = 7478;
+  static int webServerPort = 7478;
 
   /// Host to be used by the [WebServer] serving the test files.
   static const String _WEB_SERVER_HOST = "127.0.0.1";
@@ -88,8 +88,8 @@ class BrowserTestRunner extends TestRunner {
                 complete();
                 testProcess.kill();
               } else if (line != "CONSOLE MESSAGE: Warning: The "
-                  "unittestConfiguration has already been set. New "
-                  "unittestConfiguration ignored."
+                                 "unittestConfiguration has already been set. "
+                                 "New unittestConfiguration ignored."
                   && line != "Content-Type: text/plain"
                   && line != "#READY"
                   && line != "#EOF"
@@ -119,22 +119,30 @@ class BrowserTestRunner extends TestRunner {
 
   /// Starts the HTTP server (pub serve in our case) that's serving the test
   /// files. The Future completes when pub serve is ready to serve files.
-  Future<Process> startHttpServer() {
+  /// If [forceStart] is true then a new instance will be started even if one
+  /// has already been started.
+  Future<Process> startHttpServer({bool forceStart: false,
+                                  Completer<Process> originalCompleter}) {
 
     // Check if there is already pub serve running (or being started) for this
     // project.
-    if (pubServer != null) {
+    if (pubServer != null && !forceStart) {
       return pubServer;
     }
 
     // Start pub serve to serve the test directory of the project.
     var pubServerCompleter = new Completer<Process>();
+    // In case of a retry we should use the originalCompleter instead of a new
+    // one.
+    if (originalCompleter != null) {
+      pubServerCompleter = originalCompleter;
+    }
     pubServer = pubServerCompleter.future;
 
     String logs = "";
 
     Process.start(dartBinaries.pubBin,
-                  ["serve", "test", "--port", "$_WEB_SERVER_PORT"],
+                  ["serve", "test", "--port", "$webServerPort"],
                   workingDirectory: dartProject.projectPath).then(
         (Process process) {
           // Log stdout and detect when pub serve is ready.
@@ -160,7 +168,19 @@ class BrowserTestRunner extends TestRunner {
           // Detect errors/ crash of pub run.
           process.exitCode.then((exitCode) {
             if (exitCode > 0) {
-              throw new Exception("Pub serve has exited before being ready:\n$logs");
+              // If starting the web server failed because the port was already
+              // in use we increment it and try again.
+              if (logs.contains("Address already in use")) {
+                print("Warning: pub serve port $webServerPort already in use.");
+                webServerPort = webServerPort +
+                    (new math.Random()).nextInt(1000);
+                print("Trying to run pub serve with port $webServerPort.");
+                startHttpServer(forceStart: true,
+                                originalCompleter: pubServerCompleter);
+              } else {
+                throw new Exception("Pub serve has exited before being ready:"
+                                    "\n$logs");
+              }
             }
           });
         });
@@ -170,9 +190,9 @@ class BrowserTestRunner extends TestRunner {
 
   /// Returns the URL that will run the given browser test file.
   String _buildBrowserTestUrl(String testFileName) {
-    return "http://$_WEB_SERVER_HOST:$_WEB_SERVER_PORT/"
-        "${GENERATED_TEST_FILES_DIR_NAME}/"
-        "${testFileName.replaceFirst(new RegExp(r"\.dart$"), ".html")}";
+    return "http://$_WEB_SERVER_HOST:$webServerPort/"
+           "${GENERATED_TEST_FILES_DIR_NAME}/"
+           "${testFileName.replaceFirst(new RegExp(r"\.dart$"), ".html")}";
   }
 }
 
@@ -196,7 +216,8 @@ BSD-style license that can be found in the LICENSE file. -->
   <body>
     <!-- Scripts -->
     <script type="application/dart" src="/{{test_file_name}}"></script>
-    <script type="text/javascript" src="/packages/unittest/test_controller.js"></script>
+    <script type="text/javascript"
+            src="/packages/unittest/test_controller.js"></script>
   </body>
 </html>
 ''';

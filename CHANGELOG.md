@@ -1,18 +1,26 @@
 ### Changelog ###
 
 This file contains highlights of what changes on each version of the Dart Test
-Runner package.
+Runner.
+
+#### Version 0.2.16 ####
+
+Retry to run `pub serve` on another port if the port is already in use.
 
 #### Version 0.2.15 ####
 
-Now using `dart` instead of `pub run` when running VM tests.
-Added the `--dart-bin` command line option to allow setting the `dart`
+- Now using `dart` instead of `pub run` when running VM tests.
+- Added the `--dart-bin` command line option to allow setting the `dart`
 executable.
+- Making sure that `pub serve` is killed at the end.
+- Fixed bug where the stdError of Browser tests was not logged.
 
 #### Version 0.2.14 ####
 
-Fixed bug where `--skip-browser-tests` was having the opposite effect as
-intended. Also fixed a display bug with `--skip-browser-tests`.
+Some bug fixes:
+- Fixed bug where `--skip-browser-tests` was having the opposite effect as
+intended.
+- Fixed a display bug with `--skip-browser-tests`.
 
 #### Version 0.2.13 ####
 
