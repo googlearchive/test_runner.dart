@@ -360,12 +360,11 @@ void _displayTestCount(List<TestConfiguration> tests, bool erasePreviousLines,
   if (partial && disableAnsi) {
     stdout.write(".");
   } else {
-    stdout.write("\r\n");
     // Find out how many tests are browser tests.
     List<TestConfiguration> browserTests = tests.where(
             (TestConfiguration t) => t.testType is BrowserTest).toList();
 
-    print(_greenPen("Found ${tests.length} test suites "
+    print(_greenPen("\nFound ${tests.length} test suites "
     "(${tests.length - browserTests.length} "
     "Standalone VM, ${browserTests.length} Dartium)."
     + (partial ? ".." : "  ")));
