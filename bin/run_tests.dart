@@ -64,6 +64,10 @@ void runTests(
                   '"auto" will use the number of processors available on the '
                   'machine. Otherwise an integer is expected.')
     String maxProcesses: "auto",
+    @Option(help: 'Provide a custom default html file for browser tests.')
+    String defaultHtmlTemplate: "",
+    @Option(help: 'Provide a custom VM Dart template file for executing VM tests.')
+    String vmDartTemplate: "",
     @Flag(abbr: 'c', help: 'Prints the output in color in a shell.')
     bool color : false,
     @Flag(abbr: 'v', help: 'Prints all tests results instead of just the '
@@ -154,7 +158,9 @@ void runTests(
   // Step 2: Check if a Dart project can be found in [projectPathUri].
 
   DartProject dartProject = new DartProject(projectPath, dartBinaries,
-                                            maxProcesses: maxParallelProcesses);
+                                            maxProcesses: maxParallelProcesses,
+                                            customDefaultHtmlPath: defaultHtmlTemplate,
+                                            customVmDartTemplatePath: vmDartTemplate);
   print("\nLooking for Dart project in \"$projectPath\"...");
   try {
     dartProject.checkProject();

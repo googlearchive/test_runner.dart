@@ -25,6 +25,12 @@ class DartProject {
   /// Path to the root of the Dart project.
   String projectPath;
 
+  /// Custom default HTML page to run browser tests in
+  String customDefaultHtmlPath;
+
+  /// Dart template to use when generating Dart wrapper of test file
+  String customVmDartTemplatePath;
+
   Directory _testDirectory;
 
   /// The project's test folder [Directory].
@@ -41,7 +47,7 @@ class DartProject {
 
   /// Constructor. You can specify the maximum number of tests detection
   /// processes that can run in parallel with [maxProcesses].
-  DartProject(this.projectPath, this.dartBinaries, {int maxProcesses: 4})
+  DartProject(this.projectPath, this.dartBinaries, {int maxProcesses: 4, String this.customDefaultHtmlPath, String this.customVmDartTemplatePath})
       : _pool = new Pool(maxProcesses);
 
   /// Check if a Dart project can be found in [projectPath] and loads its

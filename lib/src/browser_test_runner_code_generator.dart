@@ -23,17 +23,24 @@ class BrowserTestRunnerCodeGenerator extends TestRunnerCodeGenerator {
   Future createTestHtmlFile(String testFileName, [String testHtmlFilePath]) {
     return new Future(() {
       if (testHtmlFilePath == null || testHtmlFilePath == "") {
-        // If the test does not have an associated test file we'll call the test
-        // file inside of a default HTML file.
-        return _BROWSER_TEST_HTML_FILE_TEMPLATE;
+        // If the test does not have an associated test file...
+        if (dartProject.customDefaultHtmlPath != null && dartProject.customDefaultHtmlPath.length > 0) {
+          // Use the specified default template
+          return new File(dartProject.customDefaultHtmlPath).readAsString();
+        } else {
+          // Use our predefined template
+          return _BROWSER_TEST_HTML_FILE_TEMPLATE;
+        }
       } else {
         // Custom HTML test files.
         return new File(testHtmlFilePath).readAsString();
       }
     }).then((String htmlFileString) {
       if (testHtmlFilePath == null || testHtmlFilePath == "") {
+        var pieces = testFileName.split('/');
+        var htmlInclude = pieces.last;
         htmlFileString =
-            htmlFileString.replaceAll("{{test_file_name}}", testFileName);
+            htmlFileString.replaceAll("{{test_file_name}}", htmlInclude);
       } else {
         // For custom HTML test files we add a call to
         // unittest/test_controller.js and we replace the Dart test file call by
@@ -123,7 +130,7 @@ BSD-style license that can be found in the LICENSE file. -->
   </head>
   <body>
     <!-- Scripts -->
-    <script type="application/dart" src="/{{test_file_name}}"></script>
+    <script type="application/dart" src="{{test_file_name}}"></script>
     <script type="text/javascript" src="/packages/unittest/test_controller.js"></script>
   </body>
 </html>
