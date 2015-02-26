@@ -130,11 +130,22 @@ void runTests(
           "directory or a list of test files.\n"));
       exit(2);
     } else if (!allDartFiles && projectOrTests.length == 1) {
-      projectPath = projectOrTests[0];
+      bool isProjectPath = false;
+      try {
+        isProjectPath = DartProject.isProjectPath(projectOrTests[0]);
+      } on ArgumentError catch(e) {
+        isProjectPath = false;
+      }
+
+      if (isProjectPath) {
+        projectPath = projectOrTests[0];
+      } else {
+        testPaths = projectOrTests;
+        projectPath = "./";
+      }
     } else {
       testPaths = projectOrTests;
-      projectPath = projectOrTests[0].substring(0,
-          projectOrTests[0].lastIndexOf("test/") + 5);
+      projectPath = "./";
     }
   }
 

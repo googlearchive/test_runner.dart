@@ -47,28 +47,15 @@ class DartProject {
   /// Check if a Dart project can be found in [projectPath] and loads its
   /// pubspec.yaml values into [pubSpecYaml].
   void checkProject() {
-    var projPathType = FileSystemEntity.typeSync(projectPath);
-
-    if (projPathType == FileSystemEntityType.NOT_FOUND) {
-      throw new ArgumentError('The "${new File(projectPath).absolute.path}" '
-          'directory does not exist.');
-    }
-
-    if (projPathType != FileSystemEntityType.DIRECTORY) {
-      throw new ArgumentError("\"$projectPath\" is not a directory.");
+    if (!DartProject.isProjectPath(projectPath)) {
+      throw new StateError("$projectPath is not a valid project path");
     }
 
     // Save the absolute directory and path.
     Directory projectDirectory = new Directory(projectPath);
 
     projectPath = projectDirectory.path;
-
     var pubSpecFile = new File(p.join(projectPath, 'pubspec.yaml'));
-
-    if (!pubSpecFile.existsSync()) {
-      throw new ArgumentError('"$projectPath" is not a Dart project directory.'
-          ' Could not find the "pubspec.yaml" file.');
-    }
 
     try {
       pubSpecYaml = loadYaml(pubSpecFile.readAsStringSync());
@@ -80,6 +67,28 @@ class DartProject {
     // Check if the `packages` folder exists.
     packagesFolderExists = FileSystemEntity.typeSync(
         p.join(projectPath, 'packages')) == FileSystemEntityType.DIRECTORY;
+  }
+
+  static bool isProjectPath(String path) {
+    var projPathType = FileSystemEntity.typeSync(path);
+
+    if (projPathType == FileSystemEntityType.NOT_FOUND) {
+      throw new ArgumentError('The "${new File(path).absolute.path}" '
+      'directory does not exist.');
+    }
+
+    if (projPathType != FileSystemEntityType.DIRECTORY) {
+      throw new ArgumentError("\"$path\" is not a directory.");
+    }
+
+    var pubSpecFile = new File(p.join(path, 'pubspec.yaml'));
+
+    if (!pubSpecFile.existsSync()) {
+      throw new ArgumentError('"$path" is not a Dart project directory.'
+      ' Could not find the "pubspec.yaml" file.');
+    }
+
+    return true;
   }
 
   /// Finds all the tests in the project and reads their configuration and lists
@@ -111,22 +120,20 @@ class DartProject {
     // Special case if the user has manually specified a list of tests to run.
     if (testPaths.length != 0) {
       for (String testPath in testPaths) {
-        if (!testPath.endsWith(TEST_FILE_SUFFIX)) {
-          throw new ArgumentError('The "$testPath" file does not seem to be a'
-              ' test Dart file. Test Dart files should have a "_test.dart" '
-              'suffix');
-        } else if (FileSystemEntity.isFileSync(testPath)) {
-          File testFile = new File(testPath);
-          if (!FileSystemEntity.identicalSync(
-              testFile.parent.path, testDirectory.path)) {
-            throw new ArgumentError('The "$testPath" test file is not located'
-                " in the current Dart project's test directory: " +
-                testDirectory.path);
-          } else {
-            files.add(testFile);
-          }
+        if (FileSystemEntity.isDirectorySync(testPath)) {
+          new Directory(testPath)
+            .listSync(recursive: true, followLinks: false)
+            .forEach((FileSystemEntity entity) {
+            if (entity is File) {
+              if (entity.path.endsWith(TEST_FILE_SUFFIX)) {
+                files.add(_checkTestPath(entity.path));
+              } else {
+                print('\nNotice: ignoring non-test file ${entity.path}');
+              }
+            }
+          });
         } else {
-          throw new ArgumentError('The "$testPath" file does not exist.');
+          files.add(_checkTestPath(testPath));
         }
       }
     } else {
@@ -149,6 +156,25 @@ class DartProject {
     // Notify the StreamController when all testConfig have been extracted.
     Future.wait(testConfFutureList).then((_) => controller.close());
     return controller.stream;
+  }
+
+  File _checkTestPath(String testPath) {
+    if (!testPath.endsWith(TEST_FILE_SUFFIX)) {
+      throw new ArgumentError('The "$testPath" file does not seem to be a'
+      ' test Dart file. Test Dart files should have a "_test.dart" '
+      'suffix');
+    } else if (FileSystemEntity.isFileSync(testPath)) {
+      File testFile = new File(testPath);
+      if (testFile.absolute.path.indexOf(testDirectory.absolute.path) != 0) {
+        throw new ArgumentError('The "$testPath" test file is not located'
+        " in the current Dart project's test directory: " +
+        testDirectory.path);
+      } else {
+        return testFile;
+      }
+    } else {
+      throw new ArgumentError('The "$testPath" file does not exist.');
+    }
   }
 
   /// Extracts the given test [file]'s configuration. If the [file] is not a
