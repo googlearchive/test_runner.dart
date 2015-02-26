@@ -4,7 +4,7 @@ Test Runner for Dart is an open source project. It is licensed using the
 [BSD 3-Clause License](LICENSE).
 We appreciate pull requests, here are our guidelines:
 
-1. File a bug at https://github.com/dart-lang/test_runner/issues (if there
+1. File a bug at https://github.com/google/test_runner.dart/issues (if there
 isn’t one already). If your patch is going to be large it might be a good idea
 to get the discussion started early. We are happy to discuss it in a new issue
 beforehand.
