@@ -22,6 +22,9 @@ class VmTestRunnerCodeGenerator extends TestRunnerCodeGenerator {
   Future createTestDartFile(String testFileName) {
     // Read the content fo the template Dart file.
     String dartFileString = _VM_TEST_DART_FILE_TEMPLATE;
+    if (dartProject.customVmDartTemplatePath != null && dartProject.customVmDartTemplatePath.length > 0) {
+      dartFileString = new File(dartProject.customVmDartTemplatePath).readAsStringSync();
+    }
 
     // Replaces templated values.
     dartFileString =
@@ -29,7 +32,7 @@ class VmTestRunnerCodeGenerator extends TestRunnerCodeGenerator {
     String pathDepth = testFileName.split(Platform.pathSeparator)
         .fold("", (String value, _) => "$value../");
     dartFileString =
-        dartFileString.replaceAll("{{path_depth}}", pathDepth);
+        dartFileString.replaceAll("{{test_file_import}}", pathDepth + testFileName);
 
     // Create the file (and delete it if it already exists).
     String generatedFilePath =
@@ -56,7 +59,7 @@ const String _VM_TEST_DART_FILE_TEMPLATE = '''
 library test_runner.vm_test_config;
 
 import 'package:unittest/vm_config.dart';
-import '{{path_depth}}{{test_file_name}}' as test;
+import '{{test_file_import}}' as test;
 
 /// Sets the VmConfiguration and then calls the original test file.
 void main() {
