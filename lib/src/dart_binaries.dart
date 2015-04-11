@@ -31,12 +31,11 @@ class DartBinaries {
   /// Path to the dart2js executable.
   String dart2jsBin;
 
-  DartBinaries(this.contentShellBin, this.pubBin, this.dart2jsBin,
-               this.dartBin);
+  DartBinaries(
+      this.contentShellBin, this.pubBin, this.dart2jsBin, this.dartBin);
 
-  factory DartBinaries.withDefaults() =>
-      new DartBinaries(CONTEST_SHELL_BIN_NAME, PUB_BIN_NAME, DART2JS_BIN_NAME,
-                       DART_BIN_NAME);
+  factory DartBinaries.withDefaults() => new DartBinaries(
+      CONTEST_SHELL_BIN_NAME, PUB_BIN_NAME, DART2JS_BIN_NAME, DART_BIN_NAME);
 
   /// Checks that all the Dart SDK binaries are accessible and working.
   /// If some binaries are not in the PATH a [ArgumentError] will be thrown.
@@ -59,11 +58,9 @@ class DartBinaries {
   /// run in a browser environment.
   Future<bool> isDartFileBrowserOnly(String dartFilePath) {
     return Process
-        .run(dart2jsBin, [
-      "--analyze-only",
-      "--categories=Server",
-      dartFilePath
-    ], runInShell: true)
+        .run(
+            dart2jsBin, ["--analyze-only", "--categories=Server", dartFilePath],
+            runInShell: true)
         .then((ProcessResult dart2jsPr) {
       // TODO: When dart2js has fixed the issue with their exitcode we should
       //       rely on the exitcode instead of the stdout.

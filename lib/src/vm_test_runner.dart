@@ -36,7 +36,6 @@ class VmTestRunner extends TestRunner {
     VmTestRunnerCodeGenerator codeGenerator =
         new VmTestRunnerCodeGenerator(dartProject);
     return codeGenerator.createTestDartFile(test.testFileName).then((_) {
-
       Process.runSync(dartBinaries.pubBin, ["get", "--offline"]);
 
       String newTestFilePath = p.join(dartProject.testDirectory.path,
@@ -48,7 +47,7 @@ class VmTestRunner extends TestRunner {
           .then((ProcessResult testProcess) {
         var success = testProcess.exitCode == 0;
         var testOutput =
-        testProcess.stdout.replaceAll("unittest-suite-wait-for-done", "");
+            testProcess.stdout.replaceAll("unittest-suite-wait-for-done", "");
         var testErrorOutput = testProcess.stderr;
 
         return new TestExecutionResult(test,

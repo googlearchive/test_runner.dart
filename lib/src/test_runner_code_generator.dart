@@ -22,8 +22,8 @@ abstract class TestRunnerCodeGenerator {
   /// Constructor.
   TestRunnerCodeGenerator(DartProject dartProject)
       : this.dartProject = dartProject,
-        generatedTestFilesDirectory =
-            _createGeneratedTestFilesDirectory(dartProject);
+        generatedTestFilesDirectory = _createGeneratedTestFilesDirectory(
+            dartProject);
 
   /// Returns the directory named [GENERATED_TEST_FILES_DIR_NAME] in the
   /// [dartProject]'s test directory and creates it if it doesn't exists.
@@ -31,9 +31,10 @@ abstract class TestRunnerCodeGenerator {
   /// Throws a [FileExistsException] if there is already a [FileSystemEntity]
   /// with the same name that's not a [Directory].
   static Directory _createGeneratedTestFilesDirectory(DartProject proj) {
-    String generatedTestFilesDirectoryPath =
-        proj.testDirectory.resolveSymbolicLinksSync() + "/"
-            + GENERATED_TEST_FILES_DIR_NAME;
+    String generatedTestFilesDirectoryPath = proj.testDirectory
+            .resolveSymbolicLinksSync() +
+        "/" +
+        GENERATED_TEST_FILES_DIR_NAME;
 
     Directory newGeneratedSourceDir =
         new Directory(generatedTestFilesDirectoryPath);
@@ -53,9 +54,10 @@ abstract class TestRunnerCodeGenerator {
   /// Returns [True] if a directory existed and was deleted and [False] if there
   /// was no directory.
   static bool deleteGeneratedTestFilesDirectory(DartProject dartProject) {
-    String generatedTestFilesDirectoryPath =
-        dartProject.testDirectory.resolveSymbolicLinksSync() + "/"
-            + GENERATED_TEST_FILES_DIR_NAME;
+    String generatedTestFilesDirectoryPath = dartProject.testDirectory
+            .resolveSymbolicLinksSync() +
+        "/" +
+        GENERATED_TEST_FILES_DIR_NAME;
 
     Directory newGeneratedSourceDir =
         new Directory(generatedTestFilesDirectoryPath);

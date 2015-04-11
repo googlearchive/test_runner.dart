@@ -30,7 +30,8 @@ void main() {
       });
     });
 
-    d.dir('proj', [
+    d
+        .dir('proj', [
       d.file('pubspec.yaml', unittestPubspec),
       d.dir('test', [
         d.file('simple_ok_test.dart', getTestFile()),
@@ -40,7 +41,8 @@ void main() {
           d.file('sub_fail_test.dart', getTestFile(shouldSucceed: false)),
         ])
       ])
-    ]).create();
+    ])
+        .create();
 
     schedule(() {
       var projPath = p.join(d.defaultRoot, 'proj');
@@ -49,8 +51,10 @@ void main() {
     });
 
     schedule(() {
-      return Process.run('pub', ['get', '--offline'],
-          workingDirectory: project.projectPath).then((pr) {
+      return Process
+          .run('pub', ['get', '--offline'],
+              workingDirectory: project.projectPath)
+          .then((pr) {
         expect(pr.exitCode, 0, reason: 'pub get should succeed');
       });
     });

@@ -55,7 +55,6 @@ class BrowserTestRunner extends TestRunner {
     // Runs the Web Test in Content Shell when the files have been created and
     // when all the test files have been generated.
     Future.wait([htmlFileFuture, dartFileFuture, httpServer]).then((_) {
-
       String testUrl = _buildBrowserTestUrl(test.testFileName);
 
       String testOutput = "";
@@ -64,55 +63,57 @@ class BrowserTestRunner extends TestRunner {
       var complete = () {
         if (!completer.isCompleted) {
           TestExecutionResult result = new TestExecutionResult(test,
-          success: success,
-          testOutput: testOutput,
-          testErrorOutput: testErrorOutput);
+              success: success,
+              testOutput: testOutput,
+              testErrorOutput: testErrorOutput);
           completer.complete(result);
         }
       };
 
-      Process.start(dartBinaries.contentShellBin,
-                ["--args", "--dump-render-tree",
-                 "--disable-gpu", testUrl], runInShell: false)
-             .then((Process testProcess) {
-
-        testProcess.stdout.transform(new Utf8Decoder())
+      Process
+          .start(dartBinaries.contentShellBin, [
+        "--args",
+        "--dump-render-tree",
+        "--disable-gpu",
+        testUrl
+      ], runInShell: false)
+          .then((Process testProcess) {
+        testProcess.stdout
+            .transform(new Utf8Decoder())
             .transform(new LineSplitter())
             .listen((String line) {
-              if (line == "#CRASHED") {
-                throw new Exception("Error: Content shell crashed.");
-              } else  if (line == "PASS"){
-                testOutput = "$testOutput\n$line";
-                success = true;
-              } else if (line == "#EOF") {
-                complete();
-                testProcess.kill();
-              } else if (line != "CONSOLE MESSAGE: Warning: The "
-                                 "unittestConfiguration has already been set. "
-                                 "New unittestConfiguration ignored."
-                  && line != "Content-Type: text/plain"
-                  && line != "#READY"
-                  && line != "#EOF"
-                  && line != "unittest-suite-wait-for-done") {
-                testOutput = "$testOutput\n$line";
-              }
+          if (line == "#CRASHED") {
+            throw new Exception("Error: Content shell crashed.");
+          } else if (line == "PASS") {
+            testOutput = "$testOutput\n$line";
+            success = true;
+          } else if (line == "#EOF") {
+            complete();
+            testProcess.kill();
+          } else if (line != "CONSOLE MESSAGE: Warning: The "
+                  "unittestConfiguration has already been set. "
+                  "New unittestConfiguration ignored." &&
+              line != "Content-Type: text/plain" &&
+              line != "#READY" &&
+              line != "#EOF" &&
+              line != "unittest-suite-wait-for-done") {
+            testOutput = "$testOutput\n$line";
+          }
         });
 
-        testProcess.stderr.transform(new Utf8Decoder())
+        testProcess.stderr
+            .transform(new Utf8Decoder())
             .transform(new LineSplitter())
             .listen(
                 (String line) => testErrorOutput = "$testErrorOutput\n$line");
 
         testProcess.exitCode.then((_) => complete());
-
       });
 
       // TODO: enable code coverage data gathering when
       //       https://code.google.com/p/dart/issues/detail?id=20293 is fixed.
       // import 'coverage.dart'
     });
-
-
 
     return completer.future;
   }
@@ -121,8 +122,8 @@ class BrowserTestRunner extends TestRunner {
   /// files. The Future completes when pub serve is ready to serve files.
   /// If [forceStart] is true then a new instance will be started even if one
   /// has already been started.
-  Future<Process> startHttpServer({bool forceStart: false,
-                                  Completer<Process> originalCompleter}) {
+  Future<Process> startHttpServer(
+      {bool forceStart: false, Completer<Process> originalCompleter}) {
 
     // Check if there is already pub serve running (or being started) for this
     // project.
@@ -141,49 +142,49 @@ class BrowserTestRunner extends TestRunner {
 
     String logs = "";
 
-    Process.start(dartBinaries.pubBin,
-                  ["serve", "test", "--port", "$webServerPort"],
-                  workingDirectory: dartProject.projectPath).then(
-        (Process process) {
-          // Log stdout and detect when pub serve is ready.
-          process.stdout.transform(new Utf8Decoder())
-                        .transform(new LineSplitter())
-                        .listen(
-              (String line) {
-                logs = "$logs$line\n";
-                if (line.contains("Build completed")
-                    && !pubServerCompleter.isCompleted) {
-                  pubServerCompleter.complete(process);
-                }
-              });
+    Process
+        .start(
+            dartBinaries.pubBin, ["serve", "test", "--port", "$webServerPort"],
+            workingDirectory: dartProject.projectPath)
+        .then((Process process) {
+      // Log stdout and detect when pub serve is ready.
+      process.stdout
+          .transform(new Utf8Decoder())
+          .transform(new LineSplitter())
+          .listen((String line) {
+        logs = "$logs$line\n";
+        if (line.contains("Build completed") &&
+            !pubServerCompleter.isCompleted) {
+          pubServerCompleter.complete(process);
+        }
+      });
 
-          // Log stderr.
-          process.stderr.transform(new Utf8Decoder())
-                        .transform(new LineSplitter())
-                        .listen(
-              (String line) {
-            logs = "$logs$line\n";
-          });
+      // Log stderr.
+      process.stderr
+          .transform(new Utf8Decoder())
+          .transform(new LineSplitter())
+          .listen((String line) {
+        logs = "$logs$line\n";
+      });
 
-          // Detect errors/ crash of pub run.
-          process.exitCode.then((exitCode) {
-            if (exitCode > 0) {
-              // If starting the web server failed because the port was already
-              // in use we increment it and try again.
-              if (logs.contains("Address already in use")) {
-                print("Warning: pub serve port $webServerPort already in use.");
-                webServerPort = webServerPort +
-                    (new math.Random()).nextInt(1000);
-                print("Trying to run pub serve with port $webServerPort.");
-                startHttpServer(forceStart: true,
-                                originalCompleter: pubServerCompleter);
-              } else {
-                throw new Exception("Pub serve has exited before being ready:"
-                                    "\n$logs");
-              }
-            }
-          });
-        });
+      // Detect errors/ crash of pub run.
+      process.exitCode.then((exitCode) {
+        if (exitCode > 0) {
+          // If starting the web server failed because the port was already
+          // in use we increment it and try again.
+          if (logs.contains("Address already in use")) {
+            print("Warning: pub serve port $webServerPort already in use.");
+            webServerPort = webServerPort + (new math.Random()).nextInt(1000);
+            print("Trying to run pub serve with port $webServerPort.");
+            startHttpServer(
+                forceStart: true, originalCompleter: pubServerCompleter);
+          } else {
+            throw new Exception("Pub serve has exited before being ready:"
+                "\n$logs");
+          }
+        }
+      });
+    });
 
     return pubServer;
   }
@@ -191,11 +192,10 @@ class BrowserTestRunner extends TestRunner {
   /// Returns the URL that will run the given browser test file.
   String _buildBrowserTestUrl(String testFileName) {
     return "http://$_WEB_SERVER_HOST:$webServerPort/"
-           "${GENERATED_TEST_FILES_DIR_NAME}/"
-           "${testFileName.replaceFirst(new RegExp(r"\.dart$"), ".html")}";
+        "${GENERATED_TEST_FILES_DIR_NAME}/"
+        "${testFileName.replaceFirst(new RegExp(r"\.dart$"), ".html")}";
   }
 }
-
 
 /// Template of a Default HTML file for Browser unittest files that will
 /// start the tests in the Dart file written instead of the `{{test_file_name}}`

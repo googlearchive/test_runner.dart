@@ -78,8 +78,9 @@ class DartProject {
     }
 
     // Check if the `packages` folder exists.
-    packagesFolderExists = FileSystemEntity.typeSync(
-        p.join(projectPath, 'packages')) == FileSystemEntityType.DIRECTORY;
+    packagesFolderExists = FileSystemEntity
+            .typeSync(p.join(projectPath, 'packages')) ==
+        FileSystemEntityType.DIRECTORY;
   }
 
   /// Finds all the tests in the project and reads their configuration and lists
@@ -177,14 +178,15 @@ class DartProject {
     } else {
       // We check that the test is a Browser Test using dart2js as it may not
       // have an attached HTML file.
-      return dartBinaries.isDartFileBrowserOnly(file.path).then(
-          (bool isBrowser) {
-            if (isBrowser) {
-              return new TestConfiguration(file.path, this,
-                  testType: new BrowserTest());
-            } else {
-              return new TestConfiguration(file.path, this);
-            }
+      return dartBinaries
+          .isDartFileBrowserOnly(file.path)
+          .then((bool isBrowser) {
+        if (isBrowser) {
+          return new TestConfiguration(file.path, this,
+              testType: new BrowserTest());
+        } else {
+          return new TestConfiguration(file.path, this);
+        }
       });
     }
   }

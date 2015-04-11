@@ -30,7 +30,8 @@ class TestRunnerDispatcher {
   /// Constructor. You can specify the maximum number of tests that can run in
   /// parallel with [maxProcesses].
   TestRunnerDispatcher(this.dartBinaries, this.dartProject,
-      {int maxProcesses: 4}) : _pool = new Pool(maxProcesses);
+      {int maxProcesses: 4})
+      : _pool = new Pool(maxProcesses);
 
   /// Runs all the given [tests].
   ///
