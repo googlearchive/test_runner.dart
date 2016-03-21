@@ -3,7 +3,7 @@
 [`google/dart-test-runner`][2] is a [docker](https://docker.io) image that
 makes it easy to run a [Dart](https://dartlang.org) applications tests.
 
-It automatically download a Dart application and its dependencies and run
+It automatically downloads a Dart application and its dependencies and run
 all tests of the project in an environment pre-configured with all tools to run
 tests (Dartium Content Shell, Dart SDK, Dart Test Runner...).
 
