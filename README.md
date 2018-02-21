@@ -1,3 +1,9 @@
+![status: inactive](https://img.shields.io/badge/status-inactive-red.svg)
+
+This project is no longer actively developed or maintained.
+
+See [package:test](https://pub.dartlang.org/packages/test)
+
 # Dart Test Runner
 
 The Dart Test Runner (DTR) is a command line Test Runner for Dart test files.
